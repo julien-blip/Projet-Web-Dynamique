@@ -1,0 +1,30 @@
+ function initSelectionRole() {
+    const optionsRole = document.querySelectorAll('.option_role');
+ 
+    optionsRole.forEach(function (option) {
+      option.addEventListener('click', function () {
+        const roleChoisi = this.innerText.trim();
+ 
+        document.querySelectorAll('.menu_role').forEach(function (m) {
+          m.style.display = 'none';
+        });
+ 
+        cacherVues();
+        if (page_page) page_page.style.display = 'flex';
+ 
+        if (roleChoisi === 'Etudiant') {
+          vueNavAdmin.style.display    = 'none';
+          vueNavEtudiant.style.display = 'flex';
+          vueNavProf.style.display     = 'none';
+        } else if (roleChoisi === 'Administrateur') {
+          vueNavAdmin.style.display    = 'flex';
+          vueNavEtudiant.style.display = 'none';
+          vueNavProf.style.display     = 'none';
+        } else if (roleChoisi === 'Professeur') {
+          vueNavAdmin.style.display    = 'none';
+          vueNavEtudiant.style.display = 'none';
+          vueNavProf.style.display     = 'flex';
+        }
+      });
+    });
+  }
