@@ -1,0 +1,57 @@
+  function initNavigation() {
+    if (page_btn) {
+      page_btn.addEventListener('click', function () {
+        cacherVues();
+        page_page.style.display = 'flex';
+      });
+    }
+ 
+    if (page_btn_admin) {
+      page_btn_admin.addEventListener('click', function () {
+        cacherVues();
+        page_page.style.display = 'flex';
+      });
+    }
+ 
+    if (emploi_btn) {
+      emploi_btn.addEventListener('click', function () {
+        cacherVues();
+        emploi_page.style.display = 'flex';
+      });
+    }
+ 
+    if (notes_btn) {
+      notes_btn.addEventListener('click', function () {
+        cacherVues();
+        notes_page.style.display = 'flex';
+      });
+    }
+ 
+    if (msg_btn) {
+      msg_btn.addEventListener('click', function () {
+        cacherVues();
+        msg_page.style.display = 'flex';
+      });
+    }
+ 
+    if (presences_btn) {
+      presences_btn.addEventListener('click', function () {
+        cacherVues();
+        presences_page.style.display = 'flex';
+      });
+    }
+ 
+    if (parametre_btn) {
+      parametre_btn.addEventListener('click', function () {
+        cacherVues();
+        parametre_page.style.display = 'flex';
+      });
+    }
+ 
+    if (btnEnseignantsAdmin) {
+      btnEnseignantsAdmin.addEventListener('click', function () {
+        cacherVues();
+        enseignantsPage.style.display = 'flex';
+      });
+    }
+  }
