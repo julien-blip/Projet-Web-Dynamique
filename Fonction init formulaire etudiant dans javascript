@@ -1,0 +1,15 @@
+function initFormulaireEtudiant() {
+    if (btnAjouter) {
+      btnAjouter.addEventListener('click', function () {
+        vueDashboard.style.display = 'none';
+        vueFormulaire.style.display = 'block';
+      });
+    }
+ 
+    if (btnRetour) {
+      btnRetour.addEventListener('click', function () {
+        vueFormulaire.style.display = 'none';
+        vueDashboard.style.display = 'block';
+      });
+    }
+  }
