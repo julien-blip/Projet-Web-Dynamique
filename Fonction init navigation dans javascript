@@ -1,0 +1,15 @@
+function initNavigationProf() {
+    if (btnNotesProf) {
+      btnNotesProf.addEventListener('click', function () {
+        cacherVues();
+        notationProfPage.style.display = 'flex';
+      });
+    }
+ 
+    if (btnPresencesProf) {
+      btnPresencesProf.addEventListener('click', function () {
+        cacherVues();
+        presencesProfPage.style.display = 'flex';
+      });
+    }
+  }
