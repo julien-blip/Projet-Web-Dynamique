@@ -1,0 +1,29 @@
+function initMenuRoles() {
+    const boutonsFleche = document.querySelectorAll('img[name="fleche"]');
+ 
+    boutonsFleche.forEach(function (fleche) {
+      fleche.addEventListener('click', function (e) {
+        e.stopPropagation();
+ 
+        const menuParent = this.closest('.navigateur');
+        if (menuParent) {
+          const leMenu = menuParent.querySelector('.menu_role');
+ 
+          document.querySelectorAll('.menu_role').forEach(function (m) {
+            if (m !== leMenu) m.style.display = 'none';
+          });
+ 
+          if (leMenu) {
+            leMenu.style.display = (leMenu.style.display === 'block') ? 'none' : 'block';
+          }
+        }
+      });
+    });
+ 
+    // Fermer le menu en cliquant ailleurs
+    document.addEventListener('click', function () {
+      document.querySelectorAll('.menu_role').forEach(function (m) {
+        m.style.display = 'none';
+      });
+    });
+  }
