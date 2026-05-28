@@ -1,0 +1,15 @@
+function initRecherche() {
+    const barreRecherche = document.querySelector('.recherche input');
+ 
+    if (barreRecherche) {
+      barreRecherche.addEventListener('input', function (e) {
+        const texteRecherche = e.target.value.toLowerCase();
+        const profils = document.querySelectorAll('.profil');
+ 
+        profils.forEach(function (profil) {
+          const nomEtudiant = profil.querySelector('.caracteristiques strong').innerText.toLowerCase();
+          profil.style.display = nomEtudiant.includes(texteRecherche) ? 'flex' : 'none';
+        });
+      });
+    }
+  }
