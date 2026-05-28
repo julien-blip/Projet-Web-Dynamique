@@ -1,0 +1,665 @@
+
+    body {
+      gap: 15px;
+      display: flex;
+      background: #DDDDDD;
+      margin: 0;
+      padding: 15px;
+      font-family: sans-serif;
+      height: 100vh;
+      box-sizing: border-box;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    /* --- Navigation Latérale --- */
+    #navigation_etudiant {
+      border-radius: 20px;
+      background: #F8F8F8;
+      width: 250px;
+      border: 2px solid #DDDDDD;
+      display: none;
+      flex-direction: column;
+      padding-bottom: 20px;
+    }
+    #navigation_admin {
+      border-radius: 20px;
+      background: #F8F8F8;
+      width: 250px;
+      border: 2px solid #DDDDDD;
+      display: flex;
+      flex-direction: column;
+      padding-bottom: 20px;
+    }
+	#navigation_prof {
+      border-radius: 20px;
+      background: #F8F8F8;
+      width: 250px;
+      border: 2px solid #DDDDDD;
+      display: none;
+      flex-direction: column;
+      padding-bottom: 20px;
+    }
+
+    .title {
+      display: flex;
+      align-items: center;
+      padding: 20px 10px;
+    }
+
+    .title img[name="logo"] {
+      margin-right: 10px;
+    }
+
+    nav ul {
+      list-style-type: none;
+      padding: 0 10px;
+      margin: 0;
+    }
+
+    nav li {
+      padding: 12px 15px;
+      margin-bottom: 5px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      transition: background 0.2s;
+    }
+
+    nav li:hover {
+      background: #e0e0e0;
+      cursor: pointer;
+    }
+
+.page, .emploi, .notation, .messagerie, .presences, .parametres, .enseignants, .cours-admin, .notation-prof, .presences-prof {
+  display: flex;
+  flex-direction: column;
+  border-radius: 20px;
+  background: #F8F8F8;
+  flex: 1;
+  border: 2px solid red;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.emploi, .notation, .messagerie, .presences, .parametres, .enseignants, .cours-admin, .notation-prof, .presences-prof {
+  display: none; 
+}
+
+    .contenu1 {
+      width: 100%;
+      padding: 30px;
+    }
+    
+    .contenu2 {
+      width: 100%;
+    }
+
+    /* --- En-têtes --- */
+    .haut1 {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #EEEEEE;
+    }
+
+    .haut1 strong {
+      font-size: 24px;
+    }
+    
+    .haut12 {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 20px;
+      padding-bottom: 25px;
+      padding-left: 30px;
+      border-bottom: 2px solid #EEEEEE;
+      background: red;
+      color: white;
+    }
+
+    .haut12 strong {
+      font-size: 40px;
+    }
+    
+    img[name='fleche'] {
+      cursor: pointer;
+      transition: background 0.2s, border-radius 0.2s;
+    }
+
+    img[name='fleche']:hover{
+      background: #e0e0e0;
+      border-radius: 50%;
+    }
+
+    .droite {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .recherche {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .recherche input {
+      padding: 8px 15px;
+      border-radius: 20px;
+      border: 1px solid #CCC;
+      width: 250px;
+    }
+
+    #Bouton_filtre, #Bouton_filtre_emploi {
+      background: #FFFFFF;
+      padding: 8px 15px;
+      border-radius: 20px;
+      border: 1px solid #CCC;
+      color: #333;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: bold;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+
+    #Bouton_filtre:hover, #Bouton_filtre_emploi:hover {
+      background: #EEEEEE;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .btn {
+      display: flex;
+      gap: 10px;
+    }
+
+    #Ajouter_etudiant, #Retour_dashboard {
+      background: #55AE55;
+      padding: 8px 15px;
+      border-radius: 7px;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: bold;
+    }
+
+    #Importer {
+      background: #CDCDCD;
+      padding: 8px 15px;
+      border-radius: 7px;
+      color: black;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    /* --- Vue Tableau de bord (Haut 2) --- */
+    .haut21 {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .profil {
+      display: flex;
+      flex: 1;
+      min-width: 600px;
+      background: #FFFFFF;
+      border: 2px solid #DDDDDD;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    .photo {
+      width: 150px;
+      height: 150px;
+      background: #DDDDDD;
+      border-radius: 10px;
+      margin-right: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #888;
+    }
+
+    .caracteristiques {
+      line-height: 1.6;
+    }
+
+    .statut {
+      display: flex;
+      gap: 30px;
+      line-height: 1.6;
+    }
+
+    .barriere {
+      border-left: 2px solid #DDDDDD;
+      margin: 0 20px;
+    }
+
+    .action_rapide {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      border: 2px solid #DDDDDD;
+      width: 300px;
+      padding: 20px;
+      border-radius: 10px;
+      background: #FFFFFF;
+    }
+
+    .rapide {
+      background: #EEEEEE;
+      border-radius: 5px;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .rapide:hover {
+      background: #DDDDDD;
+    }
+
+    /* --- Vue Formulaire d'ajout --- */
+    #formulaire_ajout {
+      display: none;
+    }
+
+    .form-container {
+      display: flex;
+      gap: 30px;
+      flex-wrap: wrap;
+    }
+
+    .struct {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      background: #FFFFFF;
+      border: 2px solid #DDDDDD;
+      padding: 20px;
+      border-radius: 10px;
+      flex: 1;
+      min-width: 300px;
+    }
+
+    .struct input, .struct select {
+      padding: 8px;
+      border: 1px solid #CCC;
+      border-radius: 5px;
+      margin-top: 5px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .btn-submit {
+      background: #55AE55;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 7px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.2s;
+    }
+
+    .btn-submit:hover {
+      background: #4ca04c;
+    }
+    
+    .trait {
+      margin-top: auto;
+      border-top: 1px solid #DDDDDD;
+      width: 100%;
+      margin-bottom: 15px;
+    }
+    
+    .navigateur {
+      display: flex;
+      padding: 0 15px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      position: relative;
+    }
+    
+    .userphoto {
+      width: 50px;
+      height: 50px;
+      background: grey;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* --- Menu Rôle --- */
+    .menu_role {
+      display: none;
+      position: absolute;
+      bottom: 60px;
+      right: 15px;
+      background: #FFFFFF;
+      border: 2px solid #DDDDDD;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      width: 150px;
+      overflow: hidden;
+      z-index: 10;
+    }
+
+    .option_role {
+      padding: 12px 15px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .option_role:hover {
+      background: #EEEEEE;
+    }
+    
+    /* --- EMPLOI DU TEMPS & NOTES (CSS Grid) --- */
+    .grille-edt {
+      display: grid;
+      grid-template-columns: 80px repeat(5, 1fr);
+      gap: 5px;
+      padding: 20px;
+      background: #DDDDDD;
+    }
+    
+    .grille-note {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 5px;
+      padding: 20px;
+      background: #DDDDDD;
+    }
+    
+    .indicatif {
+      background: #F1F1F1;
+      border-radius: 3px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 90px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .entete-jour, .lescours, .lesnotes, .lescoefficients, .lescredits {
+      background: #FFFFFF;
+      height: 60px; 
+    }
+
+    .case-heure, .case-matiere {
+      background: #FFFFFF;
+      font-size: 14px;
+      height: 90px;
+    }
+    
+    .cellule-vide {
+      background: #FFFFFF;
+      border-radius: 3px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 90px;
+      font-size: 18px; 
+    }
+    
+    .cours {
+      background: #ADD8E6;
+      border-radius: 3px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      font-size: 14px;
+      padding: 5px;
+      cursor: pointer;
+    }
+
+    /* --- MESSAGERIE --- */
+    .container-messagerie {
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 150px);
+      overflow: hidden;
+    }
+
+    .liste-contacts {
+      width: 300px;
+      border-right: 2px solid #DDDDDD;
+      background: #FFFFFF;
+      overflow-y: auto;
+    }
+
+    .contact {
+      display: flex;
+      align-items: center;
+      padding: 15px;
+      border-bottom: 1px solid #EEEEEE;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .contact:hover {
+      background: #F1F1F1;
+    }
+
+    .contact.actif {
+      background: #e6f2ff;
+      border-left: 4px solid #55AE55;
+    }
+
+    .photo-contact {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: #CCC;
+      margin-right: 15px;
+      flex-shrink: 0;
+    }
+
+    .info-contact h4 {
+      margin: 0 0 5px 0;
+      font-size: 15px;
+    }
+
+    .info-contact p {
+      margin: 0;
+      font-size: 13px;
+      color: #777;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 180px;
+    }
+
+    .zone-discussion {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #F8F8F8;
+    }
+
+    .entete-discussion {
+      padding: 20px;
+      border-bottom: 2px solid #DDDDDD;
+      background: #FFFFFF;
+      display: flex;
+      align-items: center;
+    }
+
+    .entete-discussion h3 {
+      margin: 0;
+    }
+
+    .historique-messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .message {
+      max-width: 60%;
+      padding: 12px 15px;
+      border-radius: 15px;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .message.recu {
+      background: #FFFFFF;
+      align-self: flex-start;
+      border: 1px solid #DDDDDD;
+      border-bottom-left-radius: 0;
+    }
+
+    .message.envoye {
+      background: #55AE55;
+      color: white;
+      align-self: flex-end;
+      border-bottom-right-radius: 0;
+    }
+
+    .zone-saisie {
+      padding: 20px;
+      background: #FFFFFF;
+      border-top: 2px solid #DDDDDD;
+      display: flex;
+      gap: 10px;
+    }
+
+    .zone-saisie input {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid #CCC;
+      border-radius: 20px;
+      outline: none;
+    }
+
+    .zone-saisie button {
+      background: #55AE55;
+      color: white;
+      border: none;
+      padding: 0 20px;
+      border-radius: 20px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* --- NOUVEAU CSS : PRÉSENCES --- */
+    .container-presences {
+      display: flex;
+      padding: 20px;
+      gap: 20px;
+      height: calc(100vh - 150px);
+    }
+
+    .liste-presences {
+      flex: 2;
+      background: #FFFFFF;
+      border: 2px solid #DDDDDD;
+      border-radius: 10px;
+      padding: 15px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .item-presence {
+      display: flex;
+      justify-content: space-between;
+      padding: 15px;
+      border-radius: 8px;
+      background: #F1F1F1;
+      align-items: center;
+    }
+
+    .item-presence.present {
+      border-left: 5px solid #55AE55;
+    }
+
+    .item-presence.absent {
+      border-left: 5px solid #E74C3C;
+    }
+
+    .statut-badge {
+      padding: 5px 10px;
+      border-radius: 15px;
+      font-weight: bold;
+      font-size: 12px;
+      color: white;
+    }
+
+    .present .statut-badge {
+      background: #55AE55;
+    }
+
+    .absent .statut-badge {
+      background: #E74C3C;
+    }
+
+    .stats-presences {
+      flex: 1;
+      background: #FFFFFF;
+      border: 2px solid #DDDDDD;
+      border-radius: 10px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Le fameux camembert en pur CSS */
+    .camembert {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: conic-gradient(#55AE55 0% 85%, #E74C3C 85% 100%);
+      margin: 30px 0;
+    }
+
+    .legende {
+      font-size: 14px;
+      line-height: 1.8;
+      width: 100%;
+    }
+
+    .dot-present {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      background: #55AE55;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+
+    .dot-absent {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      background: #E74C3C;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
