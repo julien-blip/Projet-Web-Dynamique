@@ -1,0 +1,22 @@
+ function initNavigationCours() {
+    if (btnCoursAdmin) {
+      btnCoursAdmin.addEventListener('click', function () {
+        cacherVues();
+        coursAdminPage.style.display = 'flex';
+      });
+    }
+ 
+    if (btnAjouterCours) {
+      btnAjouterCours.addEventListener('click', function () {
+        vueDashboardCours.style.display = 'none';
+        vueFormulaireCours.style.display = 'block';
+      });
+    }
+ 
+    if (btnRetourCours) {
+      btnRetourCours.addEventListener('click', function () {
+        vueFormulaireCours.style.display = 'none';
+        vueDashboardCours.style.display = 'block';
+      });
+    }
+  }
