@@ -1,0 +1,11 @@
+function cacherVues() {
+    if (page_page)        page_page.style.display        = 'none';
+    if (emploi_page)      emploi_page.style.display      = 'none';
+    if (notes_page)       notes_page.style.display       = 'none';
+    if (msg_page)         msg_page.style.display         = 'none';
+    if (presences_page)   presences_page.style.display   = 'none';
+    if (parametre_page)   parametre_page.style.display   = 'none';
+    if (enseignantsPage)  enseignantsPage.style.display  = 'none';
+    if (notationProfPage) notationProfPage.style.display = 'none';
+    if (presencesProfPage) presencesProfPage.style.display = 'none';
+  }
