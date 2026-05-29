@@ -3,6 +3,7 @@
       <img src="logo_smart.png" name="logo" height="40" alt="Logo">
       <img src="titre_smart.png" name="titre" height="25" alt="Titre">
     </div>
+	
   <nav>
       <ul>
         <li><img src="maison.png" height="20" alt="Maison"> <strong>Tableau de Bord</strong></li>
@@ -13,6 +14,7 @@
         <li><img src="homme.png" height="20" alt="Enseignant"> <strong>Info_Acad</strong></li>
       </ul>
     </nav>
+	
   <div class="trait"></div>
     
     <div class="navigateur">
@@ -28,15 +30,18 @@
         <div class="option_role">Etudiant</div>
       </div>
 	  <div class="trait"></div>
+		
 	<div class="deconnexion">
 	Deconnexion
 	</div>
+		
 </div>
 <div id="navigation_prof"> 
   <div class="title">
       <img src="logo_smart.png" name="logo" height="40" alt="Logo">
       <img src="titre_smart.png" name="titre" height="25" alt="Titre">
     </div>
+	
   <nav>
       <ul>
         <li><img src="maison.png" height="20" alt="Maison"> <strong>Tableau de Bord</strong></li>
@@ -47,6 +52,7 @@
         <li><img src="param.png" height="20" alt="Parametre"> <strong>Paramètres</strong></li>
       </ul>
     </nav>
+	
   <div class="trait"></div>
     
     <div class="navigateur">
@@ -66,11 +72,13 @@
 	Deconnexion
 	</div>
 </div>
+	
 <div id="navigation_etudiant"> 
   <div class="title">
       <img src="logo_smart.png" name="logo" height="40" alt="Logo">
       <img src="titre_smart.png" name="titre" height="25" alt="Titre">
     </div>
+	
   <nav>
       <ul>
         <li><img src="maison.png" height="20" alt="Maison"> <strong>Tableau de Bord</strong></li>
@@ -82,6 +90,7 @@
         <li id="btn_parametre"><img src="param.png" height="20" alt="Parametre"> <strong>Paramètres</strong></li>
       </ul>
     </nav>
+	
   <div class="trait"></div>
     
     <div class="navigateur">
