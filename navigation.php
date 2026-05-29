@@ -13,6 +13,24 @@
         <li><img src="homme.png" height="20" alt="Enseignant"> <strong>Info_Acad</strong></li>
       </ul>
     </nav>
+  <div class="trait"></div>
+    
+    <div class="navigateur">
+      <div class="userphoto"></div>
+      <div class="info">
+        <strong>Emma Martin</strong><br><span>Etudiante</span>
+      </div>
+      <img src='fleche.png' height ="25" name="fleche">
+      
+      <div id="menu_role2" class="menu_role">
+        <div class="option_role">Administrateur</div>
+        <div class="option_role">Professeur</div>
+        <div class="option_role">Etudiant</div>
+      </div>
+	  <div class="trait"></div>
+	<div class="deconnexion">
+	Deconnexion
+	</div>
 </div>
 <div id="navigation_prof"> 
   <div class="title">
@@ -29,6 +47,24 @@
         <li><img src="param.png" height="20" alt="Parametre"> <strong>Paramètres</strong></li>
       </ul>
     </nav>
+  <div class="trait"></div>
+    
+    <div class="navigateur">
+      <div class="userphoto"></div>
+      <div class="info">
+        <strong>Emma Martin</strong><br><span>Etudiante</span>
+      </div>
+      <img src='fleche.png' height ="25" name="fleche">
+      
+      <div id="menu_role2" class="menu_role">
+        <div class="option_role">Administrateur</div>
+        <div class="option_role">Professeur</div>
+        <div class="option_role">Etudiant</div>
+      </div>
+	  <div class="trait"></div>
+	<div class="deconnexion">
+	Deconnexion
+	</div>
 </div>
 <div id="navigation_etudiant"> 
   <div class="title">
@@ -46,4 +82,22 @@
         <li id="btn_parametre"><img src="param.png" height="20" alt="Parametre"> <strong>Paramètres</strong></li>
       </ul>
     </nav>
+  <div class="trait"></div>
+    
+    <div class="navigateur">
+      <div class="userphoto"></div>
+      <div class="info">
+        <strong>Emma Martin</strong><br><span>Etudiante</span>
+      </div>
+      <img src='fleche.png' height ="25" name="fleche">
+      
+      <div id="menu_role2" class="menu_role">
+        <div class="option_role">Administrateur</div>
+        <div class="option_role">Professeur</div>
+        <div class="option_role">Etudiant</div>
+      </div>
+	  <div class="trait"></div>
+	<div class="deconnexion">
+	Deconnexion
+	</div>
 </div>
