@@ -1,6 +1,6 @@
 <?php
 require_once 'db_connect.php';
-
+if (isset($_POST['id_expediteur']) && isset($_POST['id_destinataire'])) {
 $id_moi = intval($_POST['id_expediteur']);
     $role_moi = $_POST['role_expediteur'];
     $id_lui = intval($_POST['id_destinataire']);
@@ -15,4 +15,5 @@ $id_moi = intval($_POST['id_expediteur']);
     mysqli_stmt_bind_param($stmt, "isisisis", $id_moi, $role_moi, $id_lui, $role_lui, $id_lui, $role_lui, $id_moi, $role_moi);
     mysqli_stmt_execute($stmt);
     $resultat = mysqli_stmt_get_result($stmt);
+}
 ?>
