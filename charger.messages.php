@@ -32,5 +32,10 @@ $id_moi = intval($_POST['id_expediteur']);
         $messages_html .= '<div style="font-size: 10px; opacity: 0.6; margin-top: 5px; text-align: right;">' . $heure . '</div>';
         $messages_html .= '</div>';
     }
+    if (empty($messages_html)) {
+        echo '<div style="text-align: center; color: #999; margin-top: 20px;">Aucun message. Dites bonjour !</div>';
+    } else {
+        echo $messages_html;
+    }
 }
 ?>
