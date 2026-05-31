@@ -1,0 +1,17 @@
+<?php
+require_once 'db_connect.php';
+$id = intval($_GET['id'] ?? 0);
+if (!$id) { echo "<p>ID invalide.</p>"; exit; }
+
+$sql = "SELECT nom_matiere, code_cours, date_cours, heure, Salle, niveau
+        FROM COURS WHERE id_enseignant = ? AND date_cours IS NOT NULL
+        ORDER BY date_cours ASC";
+$stmt = mysqli_prepare($conn, $sql);
+mysqli_stmt_bind_param($stmt, "i", $id);
+mysqli_stmt_execute($stmt);
+$res = mysqli_stmt_get_result($stmt);
+
+if (mysqli_num_rows($res) == 0) {
+    echo "<p style='color:#666; text-align:center;'>Aucun cours assigné à cet enseignant.</p>";
+    exit;
+} ?>
