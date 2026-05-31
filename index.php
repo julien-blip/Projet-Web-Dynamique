@@ -56,3 +56,15 @@ while($e = mysqli_fetch_assoc($req_e)) {
 }
 $menu_comptes_html .= '</div>';
 ?>
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Gestion des Étudiants</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="javascript.js"></script>
+</head>
+<body>
+<header class="app-header">
+  <div class="titrre">SmartCampus</div>
