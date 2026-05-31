@@ -519,5 +519,154 @@ if ($role_actuel == 'Etudiant' && $id_actuel) {
           <?php
               } // Fin du while
           } // Fin du else
-          ?>
+          ?>  ?>
+        </div>
+        </div>
+      <div id="formulaire_ajout">
+        <div class="haut1">
+          <div class="gauche"><strong>Ajouter un Étudiant</strong></div>
+          <div class="droite"><div class="btn"><div id="Retour_dashboard">Retour au tableau de bord</div></div></div>
+        </div>
+
+        <form method="post" action="ajouter.php">
+          <div class="form-container">
+            <div class="struct">
+              <h3>Informations personnelles</h3>
+              <div class="input-group">
+                <label for="prenom">Prénom</label>
+                <input type="text" id="prenoml" name="ajout_prenom_etudiant" placeholder="Ex: Jean" required>
+              </div>
+			  <div class="input-group">
+                <label for="nom">Nom</label>
+                <input type="text" id="nom" name="ajout_nom_etudiant" placeholder="Ex: Dupont" required>
+              </div>
+              <div class="input-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="ajout_email_etudiant" placeholder="jean.dupont@email.com" required>
+              </div>
+              <div class="input-group">
+                <label for="date_naissance">Date de naissance</label>
+                <input type="date" id="date_naissance" name="ajout_date_etudiant" required>
+              </div>
+              <div class="input-group">
+                <label for="telephone">Téléphone</label>
+                <input type="tel" id="telephone" name="ajout_tel_etudiant" required>
+              </div>
+              <div class="input-group">
+                <label for="genre">Genre</label>
+                <select id="genre" name="ajout_genre_etudiant" required>
+                  <option value="">-- Sélectionner --</option>
+                  <option value="Homme">Homme</option>
+                  <option value="Femme">Femme</option>
+                  <option value="Autre">Autre</option>
+                </select>
+              </div>
+              <div class="input-group">
+                <label for="adresse">Adresse</label>
+                <input type="text" id="adresse" name="ajout_adresse_etudiant" required>
+              </div>
+              
+
+ <div class="input-group">
+                <label for="nationalite">Nationalité</label>
+                <select id="nationalite" name="ajout_nationalite_etudiant" required>
+                  <option value="">-- Sélectionner --</option>
+                  <option value="Francaise">Française</option>
+                  <option value="Algérienne">Algérienne</option>
+                  <option value="Allemande">Allemande</option>
+				  <option value="Américaine">Américaine</option>
+                  <option value="Belge">Belge</option>
+                  <option value="Béninoise">Béninoise</option>
+                  <option value="Britannique">Britannique</option>
+				  <option value="Burkinabè">Burkinabè</option>
+                  <option value="Camerounaise">Camerounaise</option>
+                  <option value="Canadienne">Canadienne</option>
+                  <option value="Chinoise">Chinoise</option>
+				  <option value="Congolaise">Congolaise</option>
+                  <option value="Espagnole">Espagnole</option>
+                  <option value="Ivoirienne">Ivoirienne</option>
+                  <option value="Italienne">Italienne</option>
+				  <option value="Japonaise">Japonaise</option>
+                  <option value="Malienne">Malienne</option>
+                  <option value="Marocaine">Marocaine</option>
+				  <option value="Sénégalaise">Sénégalaise</option>
+                  <option value="Suisse">Suisse</option>
+                  <option value="Togolaise">Togolaise</option>
+                  <option value="Tunisienne">Tunisienne</option>
+                </select>
+              </div>
+            </div>
+			
+			
+
+            <div class="struct">
+              <h3>Informations académiques</h3>
+	<div class="input-group">
+                <label for="niveau">Niveau Actuel</label>
+                <select id="niveau" name="ajout_niveau_etudiant" required>
+                  <option value="">-- Sélectionner --</option>
+                  <option value="ING1">ING1</option>
+                  <option value="ING2">ING2</option>
+                  <option value="ING3">ING3</option>
+                  <option value="ING4_Systeme">ING4 - Système Embarqué</option>
+                  <option value="ING4_Cyber">ING4 - CyberSécurité</option>
+				  <option value="ING4_Finance">ING4 - Finance</option>
+                  <option value="ING4_Energie">ING4 - Energie</option>
+                  <option value="ING5_Systeme">ING5 - Système Embarqué</option>
+                  <option value="ING5_Cyber">ING5 - CyberSécurité</option>
+				  <option value="ING5_Finance">ING5 - Finance</option>
+                  <option value="ING5_Energie">ING5 - Energie</option>
+                </select>
+              </div>
+			  <div class="input-group">
+                <label for="annee">Année académique</label>
+                <select id="annee" name="ajout_annee_etudiant" required>
+                  <option value="">-- Sélectionner --</option>
+                  <option value="2025 - 2026">2025 - 2026</option>
+                  <option value="2024 - 2025">2024 - 2025</option>
+                  <option value="2023 - 2024">2023 - 2024</option>
+				  <option value="2022 - 2023">2022 - 2023</option>
+                  <option value="2021 - 2022">2021 - 2022</option>
+                </select>
+              </div>
+              <div class="input-group">
+                <label for="statut">Statut</label>
+                <select id="statut" name="ajout_statut_etudiant" required>
+				  <option value="">-- Sélectionner --</option>
+                  <option value="Actif">Actif</option>
+                  <option value="Inactif">Inactif</option>
+                </select>
+              </div>
+              <button type="submit" name="button_ajouter" class="btn-submit">Ajouter l'étudiant</button>
+            </div>
+          </div>
+        </form>
+
+      </div>
+	  <div id="vue_profil_complet" style="display: none;">
+  <div class="haut1">
+    <div class="gauche"><strong>Profil Complet de l'Étudiant</strong></div>
+    <div class="droite">
+      <div class="btn">
+        <div id="Retour_dashboard_profil" style="background: #CDCDCD; padding: 8px 15px; border-radius: 7px; font-weight: bold; cursor: pointer;">Retour au tableau de bord</div>
+      </div>
+    </div>
+  </div>
+  <div id="contenu_profil_complet" style="background: white; padding: 20px; border-radius: 10px; margin-top: 20px;">
+    <p style="color: #999; text-align: center;">Chargement...</p>
+  </div>
+</div>
+    </div>
+  </div>
+ <div class="page-cours-etudiant" style="display: none;">
+  <div class="contenu20">
+    <div class="haut12" style="padding: 20px 20px 0 20px;">
+      <h2>Gestion de mes cours</h2>
+    </div>
+      <div class="fond" style="background : #f8f9fa;">
+    <div class="layout-deux-colonnes" style="display: flex; gap: 20px; padding: 20px; align-items: flex-start;">
+        
+      <?php
+      if ($role_actuel == "Etudiant" && $id_actuel) {
+      ?>
 
