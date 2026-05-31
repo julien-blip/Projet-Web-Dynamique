@@ -121,78 +121,7 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
                 <input type="text" id="adresse" name="modif_adresse" value="<?= htmlspecialchars($etudiant['adresse']) ?>" required>
               </div>
               
-              <div class="input-group">
-                <label for="nationalite">Nationalité</label>
-                <select id="nationalite" name="modif_nationalite" required>
-                  <option value="">-- Sélectionner --</option>
-                  <option value="Française" <?= $etudiant['nationalite'] == 'Française' ? 'selected' : '' ?>>Française</option>
-                  <option value="Algérienne" <?= $etudiant['nationalite'] == 'Algérienne' ? 'selected' : '' ?>>Algérienne</option>
-                  <option value="Allemande" <?= $etudiant['nationalite'] == 'Allemande' ? 'selected' : '' ?>>Allemande</option>
-                  <option value="Américaine" <?= $etudiant['nationalite'] == 'Américaine' ? 'selected' : '' ?>>Américaine</option>
-                  <option value="Belge" <?= $etudiant['nationalite'] == 'Belge' ? 'selected' : '' ?>>Belge</option>
-                  <option value="Béninoise" <?= $etudiant['nationalite'] == 'Béninoise' ? 'selected' : '' ?>>Béninoise</option>
-                  <option value="Britannique" <?= $etudiant['nationalite'] == 'Britannique' ? 'selected' : '' ?>>Britannique</option>
-                  <option value="Burkinabè" <?= $etudiant['nationalite'] == 'Burkinabè' ? 'selected' : '' ?>>Burkinabè</option>
-                  <option value="Camerounaise" <?= $etudiant['nationalite'] == 'Camerounaise' ? 'selected' : '' ?>>Camerounaise</option>
-                  <option value="Canadienne" <?= $etudiant['nationalite'] == 'Canadienne' ? 'selected' : '' ?>>Canadienne</option>
-                  <option value="Chinoise" <?= $etudiant['nationalite'] == 'Chinoise' ? 'selected' : '' ?>>Chinoise</option>
-                  <option value="Congolaise" <?= $etudiant['nationalite'] == 'Congolaise' ? 'selected' : '' ?>>Congolaise</option>
-                  <option value="Espagnole" <?= $etudiant['nationalite'] == 'Espagnole' ? 'selected' : '' ?>>Espagnole</option>
-                  <option value="Ivoirienne" <?= $etudiant['nationalite'] == 'Ivoirienne' ? 'selected' : '' ?>>Ivoirienne</option>
-                  <option value="Italienne" <?= $etudiant['nationalite'] == 'Italienne' ? 'selected' : '' ?>>Italienne</option>
-                  <option value="Japonaise" <?= $etudiant['nationalite'] == 'Japonaise' ? 'selected' : '' ?>>Japonaise</option>
-                  <option value="Malienne" <?= $etudiant['nationalite'] == 'Malienne' ? 'selected' : '' ?>>Malienne</option>
-                  <option value="Marocaine" <?= $etudiant['nationalite'] == 'Marocaine' ? 'selected' : '' ?>>Marocaine</option>
-                  <option value="Sénégalaise" <?= $etudiant['nationalite'] == 'Sénégalaise' ? 'selected' : '' ?>>Sénégalaise</option>
-                  <option value="Suisse" <?= $etudiant['nationalite'] == 'Suisse' ? 'selected' : '' ?>>Suisse</option>
-                  <option value="Togolaise" <?= $etudiant['nationalite'] == 'Togolaise' ? 'selected' : '' ?>>Togolaise</option>
-                  <option value="Tunisienne" <?= $etudiant['nationalite'] == 'Tunisienne' ? 'selected' : '' ?>>Tunisienne</option>
-                </select>
-              </div>
-            </div>
-            
-            <div class="struct">
-              <h3>Informations académiques</h3>
-
-              <div class="input-group">
-                <label for="filiere">Niveau Actuel</label>
-                <select id="filiere" name="modif_filiere" required>
-                  <option value="">-- Sélectionner --</option>
-                  <option value="ING1" <?= $etudiant['niveau'] == 'ING1' ? 'selected' : '' ?>>ING1</option>
-                  <option value="ING2" <?= $etudiant['niveau'] == 'ING2' ? 'selected' : '' ?>>ING2</option>
-                  <option value="ING3" <?= $etudiant['niveau'] == 'ING3' ? 'selected' : '' ?>>ING3</option>
-                  <option value="ING4_Système" <?= $etudiant['niveau'] == 'ING4 - Système' ? 'selected' : '' ?>>ING4 - Système</option>
-                  <option value="ING4_Cyber" <?= $etudiant['niveau'] == 'ING4 - Cyber' ? 'selected' : '' ?>>ING4 - Cyber</option>
-				  <option value="ING4_Energie" <?= $etudiant['niveau'] == 'ING4 - Finance' ? 'selected' : '' ?>>ING4 - Finance</option>
-                  <option value="ING4_Energie" <?= $etudiant['niveau'] == 'ING4 - Energie' ? 'selected' : '' ?>>ING4 - Energie</option>
-                  <option value="ING5_Système" <?= $etudiant['niveau'] == 'ING5 - Système' ? 'selected' : '' ?>>ING5 - Système</option>
-                  <option value="ING5_Cyber" <?= $etudiant['niveau'] == 'ING5 - Cyber' ? 'selected' : '' ?>>ING5 - Cyber</option>
-				  <option value="ING5_Finance" <?= $etudiant['niveau'] == 'ING5 - Finance' ? 'selected' : '' ?>>ING5 - Finance</option>
-                  <option value="ING5_Energie" <?= $etudiant['niveau'] == 'ING5 - Energie' ? 'selected' : '' ?>>ING5 - Energie </option>
-                </select>
-              </div>
-
-             
-
-              <div class="input-group">
-                <label for="annee">Année académique</label>
-                <select id="annee" name="modif_annee" required>
-                  <option value="">-- Sélectionner --</option>
-                  <option value="2025-2026" <?= $etudiant['annee_academique'] == '2025-2026' ? 'selected' : '' ?>>2025 - 2026</option>
-                  <option value="2024-2025" <?= $etudiant['annee_academique'] == '2024-2025' ? 'selected' : '' ?>>2024 - 2025</option>
-                  <option value="2023-2024" <?= $etudiant['annee_academique'] == '2023-2024' ? 'selected' : '' ?>>2023 - 2024</option>
-                  <option value="2022-2023" <?= $etudiant['annee_academique'] == '2022-2023' ? 'selected' : '' ?>>2022 - 2023</option>
-                  <option value="2021-2022" <?= $etudiant['annee_academique'] == '2021-2022' ? 'selected' : '' ?>>2021 - 2022</option>
-                </select>
-              </div>
               
-              <div class="input-group">
-                <label for="statut">Statut</label>
-                <select id="statut" name="modif_statut" required>
-                  <option value="">-- Sélectionner --</option>
-                  <option value="actif" <?= $etudiant['statut'] == 'actif' ? 'selected' : '' ?>>Actif</option>
-                  <option value="inactif" <?= $etudiant['statut'] == 'inactif' ? 'selected' : '' ?>>Inactif</option>
-                </select>
               </div>
               
 
