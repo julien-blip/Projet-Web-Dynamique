@@ -1,6 +1,13 @@
 <?php 
 require_once 'db_connect.php'; 
 
+$TYPES_EVAL = [
+    'Suivi'   => ['label' => 'Note de suivi',     'coef' => 1],
+    'DS'      => ['label' => 'Devoir surveillé',   'coef' => 2],
+    'TP'      => ['label' => 'Travaux pratiques',  'coef' => 1],
+    'Projet'  => ['label' => 'Projet',             'coef' => 2],
+    'Examen'  => ['label' => 'Examen final',       'coef' => 3],
+];
 
 // 1. LOGIQUE DE SIMULATION D'UTILISATEUR
 $role_actuel = "Administrateur";
