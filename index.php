@@ -230,3 +230,127 @@ if ($role_actuel == 'Etudiant' && $id_actuel) {
 }
 ?>
 
+	
+<div class="vue-tb-admin" style="display: <?php echo ($role_actuel == 'Administrateur') ? 'block' : 'none'; ?>; width: 100%;">
+  <div class="haut12" style="padding: 20px;"><h2>Vue d'ensemble - Administrateur</h2></div>
+  <div class="dashboard-grid" style="min-height : 575px;">
+    <div class="dashboard-card tuile-dash" data-cle="adm_etudiants">
+      <h3>Gestion des étudiants</h3>
+      <p><?php echo $adm_nb_etu ?? '—'; ?></p>
+      <span>Étudiants inscrits</span>
+    </div>
+    <div class="dashboard-card tuile-dash" data-cle="adm_enseignants">
+      <h3>Gestion des enseignants</h3>
+      <p><?php echo $adm_nb_prof ?? '—'; ?></p>
+      <span>Enseignants enregistrés</span>
+    </div>
+    <div class="dashboard-card tuile-dash" data-cle="adm_cours">
+      <h3>Gestion des cours</h3>
+      <p><?php echo $adm_nb_cours ?? '—'; ?></p>
+      <span>Cours créés</span>
+    </div>
+    <div class="dashboard-card tuile-dash" data-cle="adm_stats">
+      <h3>Statistiques simples</h3>
+      <ul>
+        <li>Inscriptions totales : <?php echo $adm_nb_insc ?? '—'; ?></li>
+        <li>Moyenne générale : <?php echo ($adm_moy !== null && $adm_moy !== '') ? $adm_moy.'/20' : '—'; ?></li>
+        <li>Cours / enseignant : <?php echo ($adm_nb_prof) ? round($adm_nb_cours / max(1,$adm_nb_prof),1) : '—'; ?></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="vue-tb-prof" style="display: <?php echo ($role_actuel == 'Professeur') ? 'block' : 'none'; ?>; width: 100%;">
+  <div class="haut12" style="padding: 20px; display:flex; justify-content:space-between; align-items:center;">
+    <h2 style="margin:0;">Vue d'ensemble - Professeur</h2>
+    <div style="position:relative;">
+      <button class="btn-perso-dash" style="background:#0056b3; color:white; border:none; padding:8px 14px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:13px;">⚙️ Personnaliser</button>
+      <div class="popup-perso-dash" style="display:none; position:absolute; right:0; top:42px; background:black; border:1px solid #ccc; border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.15); padding:15px; width:240px; z-index:1000; text-align:left;">
+        <h4 style="margin:0 0 10px;">Afficher jusqu'à 4 cartes</h4>
+        <label style="display:block; margin:6px 0; cursor:pointer;"><input type="checkbox" class="chk-tuile" value="prof_cours"> Cours enseignés</label>
+        <label style="display:block; margin:6px 0; cursor:pointer;"><input type="checkbox" class="chk-tuile" value="prof_etudiants"> Étudiants inscrits</label>
+        <label style="display:block; margin:6px 0; cursor:pointer;"><input type="checkbox" class="chk-tuile" value="prof_notes"> Notes à saisir</label>
+        <label style="display:block; margin:6px 0; cursor:pointer;"><input type="checkbox" class="chk-tuile" value="prof_presences"> Présences à enregistrer</label>
+        <label style="display:block; margin:6px 0; cursor:pointer;"><input type="checkbox" class="chk-tuile" value="prof_messages"> Messages</label>
+        <button class="btn-valider-perso" style="margin-top:10px; width:100%; background:#28a745; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer; font-weight:bold;">Valider</button>
+      </div>
+    </div>
+  </div>
+  <div class="dashboard-grid"style="min-height : 600px;">
+    <div class="dashboard-card tuile-dash" data-cle="prof_cours">
+      <h3>Cours enseignés</h3>
+      <?php if (count($prof_cours)): ?>
+        <ul><?php foreach ($prof_cours as $c): ?><li><?php echo htmlspecialchars($c['code_cours'].' : '.$c['nom_matiere']); ?></li><?php endforeach; ?></ul>
+      <?php else: ?><p>0</p><span>Aucun cours assigné</span><?php endif; ?>
+    </div>
+    <div class="dashboard-card tuile-dash" data-cle="prof_etudiants">
+      <h3>Étudiants inscrits</h3>
+      <p><?php echo $prof_nb_etu ?? '—'; ?></p>
+      <span>Dans vos cours</span>
+    </div>
+    <div class="dashboard-card tuile-dash" data-cle="prof_notes">
+      <h3>Notes à saisir</h3>
+      <p style="color:#cc0000;"><?php echo $prof_nb_notes ?? '—'; ?></p>
+      <span>Évaluations en attente</span>
+    </div>
+    <div class="dashboard-card tuile-dash" data-cle="prof_presences">
+      <h3>Présences à enregistrer</h3>
+      <p><?php echo $prof_seances_jour ?? '—'; ?></p>
+      <span>Séance(s) aujourd'hui</span>
+    </div>
+    <div class="dashboard-card tuile-dash" id="tuile_messages_prof" data-cle="prof_messages" style="cursor:pointer;">
+      <h3>Messages</h3>
+      <p><?php echo $prof_nb_msg ?? '—'; ?></p>
+      <span>Message(s) reçu(s)</span>
+    </div>
+  </div>
+</div>
+
+<div class="vue-tb-etudiant" style="display: <?php echo ($role_actuel == 'Etudiant') ? 'block' : 'none'; ?>; width: 100%;">
+  <div class="haut12" style="padding: 20px; display:flex; justify-content:space-between; align-items:center;">
+    <h2 style="margin:0;">Vue d'ensemble - Étudiant</h2>
+    <div style="position:relative;">
+      <button class="btn-perso-dash" style="background:#0056b3; color:white; border:none; padding:8px 14px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:13px;">⚙️ Personnaliser</button>
+      <div class="popup-perso-dash" style="display:none; position:absolute; right:0; top:42px; background:white; border:1px solid #ccc; border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.15); padding:15px; width:240px; z-index:1000; text-align:left;">
+        <h4 style="margin:0 0 10px;">Afficher jusqu'à 4 cartes</h4>
+        <label style="display:block; margin:6px 0; cursor:pointer;"><input type="checkbox" class="chk-tuile" value="etu_cours"> Cours suivis</label>
+        <label style="display:block; margin:6px 0; cursor:pointer;"><input type="checkbox" class="chk-tuile" value="etu_seances"> Prochaines séances</label>
+        <label style="display:block; margin:6px 0; cursor:pointer;"><input type="checkbox" class="chk-tuile" value="etu_notes"> Notes récentes</label>
+        <label style="display:block; margin:6px 0; cursor:pointer;"><input type="checkbox" class="chk-tuile" value="etu_absences"> Absences</label>
+        <label style="display:block; margin:6px 0; cursor:pointer;"><input type="checkbox" class="chk-tuile" value="etu_notifs"> Notifications</label>
+        <button class="btn-valider-perso" style="margin-top:10px; width:100%; background:#28a745; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer; font-weight:bold;">Valider</button>
+      </div>
+    </div>
+  </div>
+  <div class="dashboard-grid"style="min-height : 600px;">
+    <div class="dashboard-card tuile-dash" data-cle="etu_cours">
+      <h3>Cours suivis</h3>
+      <p><?php echo $etu_nb_cours ?? '—'; ?></p>
+      <span>Modules ce semestre</span>
+    </div>
+    <div class="dashboard-card tuile-dash" data-cle="etu_seances">
+      <h3>Prochaines séances</h3>
+      <?php if (count($etu_prochaines)): ?>
+        <ul><?php foreach ($etu_prochaines as $s): ?><li><?php echo htmlspecialchars($s['date_cours'].' ('.$s['heure'].') : '.$s['nom_matiere']); ?></li><?php endforeach; ?></ul>
+      <?php else: ?><span>Aucune séance à venir</span><?php endif; ?>
+    </div>
+    <div class="dashboard-card tuile-dash" data-cle="etu_notes">
+      <h3>Notes récentes</h3>
+      <?php if (count($etu_notes)): ?>
+        <ul><?php foreach ($etu_notes as $n): ?><li><?php echo htmlspecialchars($n['nom_matiere'].' : '.$n['note'].'/20'); ?></li><?php endforeach; ?></ul>
+      <?php else: ?><span>Aucune note disponible</span><?php endif; ?>
+    </div>
+    <div class="dashboard-card tuile-dash" data-cle="etu_absences">
+      <h3>Absences</h3>
+      <p style="color:#cc0000;"><?php echo $etu_absences ?? '—'; ?></p>
+      <span>Absence(s) injustifiée(s)</span>
+    </div>
+    <div class="dashboard-card tuile-dash" data-cle="etu_notifs">
+      <h3>Notifications</h3>
+      <?php if (count($etu_notifs)): ?>
+        <ul><?php foreach ($etu_notifs as $no): ?><li><?php echo htmlspecialchars($no['contenu']); ?></li><?php endforeach; ?></ul>
+      <?php else: ?><span>Aucune notification</span><?php endif; ?>
+    </div>
+  </div>
+</div>
+
