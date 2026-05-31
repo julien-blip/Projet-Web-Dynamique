@@ -889,4 +889,114 @@ $nb_notes = count(array_filter($notes_lignes, fn($n) => $n['note'] !== null && $
             </tr>
           </thead>
           <tbody>
+			  <?php
+            if (count($notes_lignes) == 0) {
+                echo "<tr><td colspan='5' style='padding:20px; text-align:center; color:#666;'>Vous n'êtes inscrit à aucun cours.</td></tr>";
+            } else {
+                foreach ($notes_lignes as $n) {
+                    $matiere = htmlspecialchars($n['nom_matiere']);
+                    $eval = htmlspecialchars($n['evaluation'] ?? 'Examen Final');
+                    if (isset($n['note']) && $n['note'] !== null && $n['note'] !== '') {
+                        $estReussi = ($n['note'] >= 10);
+                        $bgBadge = $estReussi ? '#e6f7ec' : '#fdecea';
+                        $colBadge = $estReussi ? '#28a745' : '#cc0000';
+                        $badge = '<span style="background:'.$bgBadge.'; color:'.$colBadge.'; padding:6px 12px; border-radius:20px; font-weight:bold; font-size:14px; white-space:nowrap;">'.htmlspecialchars($n['note']).' / 20</span>';
+                        $commentaire = htmlspecialchars($n['commentaire'] ?? '-');
+                    } else {
+                        $badge = '<span style="background:#f0f0f0; color:#999; padding:6px 12px; border-radius:20px; font-size:14px;">En attente</span>';
+                        $commentaire = '<span style="color:#999; font-style:italic;">En attente d\'évaluation…</span>';
+                    }
+                    $coeff_affiche = isset($n['coefficient']) && $n['coefficient'] > 0 ? $n['coefficient'] : '1';
+echo '<tr style="border-bottom:1px solid #eee;">';
+echo '  <td style="padding:15px; font-weight:bold; color:#333;">'.$matiere.'</td>';
+echo '  <td style="padding:15px; color:#666;">'.$eval.'</td>';
+echo '  <td style="padding:15px; text-align:center; color:#0056b3; font-weight:bold;">× '.$coeff_affiche.'</td>';
+echo '  <td style="padding:15px; text-align:center;">'.$badge.'</td>';
+echo '  <td style="padding:15px; color:#555;">'.$commentaire.'</td>';
+echo '</tr>';
+                }
+            }
+            ?>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+  <div class="messagerie" style="display: none;">
+    <div class="contenu2">
+      <div class="haut12" style="display: flex; justify-content: space-between; align-items: center;">
+        <div class="gauche">
+          <strong>MESSAGES</strong>
+        </div>
+        <div class="droite">
+          <input type="text" id="recherche_contact_msg" placeholder="Rechercher un contact..." style="padding: 8px; border-radius: 5px; border: 1px solid #ccc; width: 200px;">
+        </div>
+      </div>
+
+      <div class="container-messagerie">
+        
+        <!-- COLONNE GAUCHE : LISTE DES CONTACTS (Remplie avec PHP) -->
+        <div class="liste-contacts" id="liste_des_contacts" style="overflow-y: auto; max-height: 500px;">
+          <?php
+          // 1. On liste tous les Professeurs
+          $req_profs_msg = mysqli_query($conn, "SELECT id_enseignant AS id, nom, prenom, 'Professeur' AS role FROM ENSEIGNANT ORDER BY nom ASC");
+          while($p = mysqli_fetch_assoc($req_profs_msg)) {
+              // On ne s'affiche pas soi-même dans la liste
+              if ($role_actuel == 'Professeur' && $id_actuel == $p['id']) continue;
+              
+              echo '<div class="contact contact-item" data-id="'.$p['id'].'" data-role="'.$p['role'].'" data-nom="'.htmlspecialchars($p['prenom'].' '.$p['nom']).'" style="cursor: pointer;">';
+              echo '  <div class="photo-contact"></div>';
+              echo '  <div class="info-contact">';
+              echo '    <h4>'.htmlspecialchars($p['prenom'].' '.$p['nom']).'</h4>';
+              echo '    <p style="font-size: 11px; color: #888;">Professeur</p>';
+              echo '  </div>';
+              echo '</div>';
+          }
+<!-- COLONNE DROITE : LE TCHAT -->
+        <div class="zone-discussion" id="zone_discussion_ajax">
+          <div class="entete-discussion" style="display: flex; align-items: center; gap: 10px;">
+            <div class="photo-contact" id="chat_photo" style="display: none;"></div>
+            <h3 id="nom_contact_actif">Sélectionnez un contact pour discuter</h3>
+          </div>
+
+          <div class="historique-messages" id="boite_messages" style="display: flex; flex-direction: column; overflow-y: auto; padding: 20px;">
+            <!-- Les messages arriveront ici automatiquement -->
+            <div style="text-align: center; color: #999; margin-top: 50px;">
+               👈 Cliquez sur un nom dans la liste à gauche.
+            </div>
+          </div>
+
+          <div class="zone-saisie" id="zone_saisie_message" style="display: none;">
+            <!-- Champs cachés pour dire à PHP qui envoie à qui -->
+            <input type="hidden" id="expediteur_id" value="<?php echo $id_actuel; ?>">
+            <input type="hidden" id="expediteur_role" value="<?php echo $role_actuel; ?>">
+            <input type="hidden" id="destinataire_id" value="">
+            <input type="hidden" id="destinataire_role" value="">
+            
+            <input type="text" id="input_nouveau_message" placeholder="Écrivez votre message...">
+            <button id="btn_envoyer_ajax">Envoyer</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+          // 2. On liste tous les Étudiants
+          $req_etus_msg = mysqli_query($conn, "SELECT id_etudiant AS id, nom, prenom, 'Etudiant' AS role FROM ETUDIANT ORDER BY nom ASC");
+          while($e = mysqli_fetch_assoc($req_etus_msg)) {
+              if ($role_actuel == 'Etudiant' && $id_actuel == $e['id']) continue;
+              
+              echo '<div class="contact contact-item" data-id="'.$e['id'].'" data-role="'.$e['role'].'" data-nom="'.htmlspecialchars($e['prenom'].' '.$e['nom']).'" style="cursor: pointer;">';
+              echo '  <div class="photo-contact"></div>';
+              echo '  <div class="info-contact">';
+              echo '    <h4>'.htmlspecialchars($e['prenom'].' '.$e['nom']).'</h4>';
+              echo '    <p style="font-size: 11px; color: #888;">Étudiant</p>';
+              echo '  </div>';
+              echo '</div>';
+          }
+          ?>
 
