@@ -1,0 +1,271 @@
+<?php
+// Fichier : modifier_cours.php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+require_once 'db_connect.php';
+
+// --- 1. TRAITEMENT DE LA MODIFICATION (Quand on valide le formulaire) ---
+if (isset($_POST['button_modifier_cours'])) {
+    $id_cours = intval($_POST['id_cours']);
+    $titre = trim($_POST['modif_titre'] ?? '');
+    $code = trim($_POST['modif_code'] ?? '');
+    $departement = trim($_POST['modif_dep'] ?? '');
+    $niveau = trim($_POST['modif_niveau'] ?? '');
+    $heure = trim($_POST['horaire_cours'] ?? '');
+    $date_cours = trim($_POST['date_cours'] ?? '');
+    $salle = trim($_POST['Salle'] ?? ''); // Récupère correctement la salle grâce au name="Salle"
+    
+    // Si on a choisi "Aucun enseignant", on met NULL dans la base
+    $id_enseignant = !empty($_POST['modif_prof']) ? intval($_POST['modif_prof']) : NULL;
+
+    // Structure de la requête : 8 colonnes à modifier + 1 ID dans le WHERE = 9 paramètres au total
+    $sql_update = "UPDATE COURS SET nom_matiere = ?, code_cours = ?, departement = ?, niveau = ?, id_enseignant = ?, date_cours = ?, heure = ?, Salle = ? WHERE id_cours = ?";
+    $stmt = mysqli_prepare($conn, $sql_update);
+    
+    // CORRECTION DE L'ORDRE ET DES TYPES : 
+    // $titre(s), $code(s), $departement(s), $niveau(s), $id_enseignant(i/null), $date_cours(s), $heure(s), $salle(s), $id_cours(i)
+    // Ce qui donne le format : "ssssisssi"
+    mysqli_stmt_bind_param($stmt, "ssssisssi", $titre, $code, $departement, $niveau, $id_enseignant, $date_cours, $heure, $salle, $id_cours);
+    
+    if (mysqli_stmt_execute($stmt)) {
+        header("Location: index.php?msg=modification_cours_reussie");
+        exit();
+    } else {
+        echo "Erreur lors de la modification : " . mysqli_error($conn);
+    }
+}
+
+// --- 2. RÉCUPÉRATION DES DONNÉES DU COURS (Pour pré-remplir) ---
+if (isset($_GET['id']) && !empty($_GET['id'])) {
+    $id = intval($_GET['id']);
+    
+    $sql_select = "SELECT * FROM COURS WHERE id_cours = ?";
+    $stmt_select = mysqli_prepare($conn, $sql_select);
+    mysqli_stmt_bind_param($stmt_select, "i", $id);
+    mysqli_stmt_execute($stmt_select);
+    $resultat = mysqli_stmt_get_result($stmt_select);
+    
+    $cours = mysqli_fetch_assoc($resultat);
+    
+    if (!$cours) {
+        die("Cours introuvable dans la base de données.");
+    }
+} else {
+    die("Aucun cours sélectionné.");
+}
+?>
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Modifier un cours</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+      .input-group { margin-bottom: 15px; display: flex; flex-direction: column; }
+      .input-group label { margin-bottom: 5px; font-weight: bold; color: #555; }
+      .input-group input, .input-group select { padding: 10px; border: 1px solid #CCC; border-radius: 5px; }
+  </style>
+</head>
+<body style="padding: 50px; justify-content: center; background: #DDDDDD;">
+
+  <div class="struct" style="max-width: 600px; margin: auto; background: #FFFFFF; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    
+    <div class="haut1" style="border-bottom: 2px solid #EEEEEE; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between;">
+      <div class="gauche" style="font-size: 20px;"><strong>Modifier le cours</strong></div>
+      <div class="droite">
+        <a href="index.php" style="padding: 8px 15px; background: #CDCDCD; color: black; text-decoration: none; border-radius: 5px; font-weight: bold;">Annuler</a>
+      </div>
+    </div>
+
+    <form method="post" action="modifier_cours.php">
+      
+      <input type="hidden" name="id_cours" value="<?php echo $cours['id_cours']; ?>">
+
+      <div class="input-group">
+        <label>Titre du cours</label>
+        <input type="text" name="modif_titre" value="<?php echo htmlspecialchars($cours['nom_matiere']); ?>" required>
+      </div>
+
+      <div class="input-group">
+        <label>Code du cours</label>
+        <input type="text" name="modif_code" value="<?php echo htmlspecialchars($cours['code_cours']); ?>" required>
+      </div>
+      
+      <div class="input-group">
+        <label for="semestre_cours">Niveau Actuel</label>
+        <select id="semestre_cours" name="modif_niveau" required>
+          <option value="">-- Sélectionner --</option>
+          <option value="ING1" <?php if(isset($cours['niveau']) && $cours['niveau'] == 'ING1') echo 'selected'; ?>>ING1</option>
+          <option value="ING2" <?php if(isset($cours['niveau']) && $cours['niveau'] == 'ING2') echo 'selected'; ?>>ING2</option>
+          <option value="ING3" <?php if(isset($cours['niveau']) && $cours['niveau'] == 'ING3') echo 'selected'; ?>>ING3</option>
+          <option value="ING4_Systeme" <?php if(isset($cours['niveau']) && $cours['niveau'] == 'ING4_Systeme') echo 'selected'; ?>>ING4 - Système Embarqué</option>
+          <option value="ING4_Cyber" <?php if(isset($cours['niveau']) && $cours['niveau'] == 'ING4_Cyber') echo 'selected'; ?>>ING4 - CyberSécurité</option>
+          <option value="ING4_Finance" <?php if(isset($cours['niveau']) && $cours['niveau'] == 'ING4_Finance') echo 'selected'; ?>>ING4 - Finance</option>
+          <option value="ING4_Energie" <?php if(isset($cours['niveau']) && $cours['niveau'] == 'ING4_Energie') echo 'selected'; ?>>ING4 - Energie</option>
+          <option value="ING5_Systeme" <?php if(isset($cours['niveau']) && $cours['niveau'] == 'ING5_Systeme') echo 'selected'; ?>>ING5 - Système Embarqué</option>
+          <option value="ING5_Cyber" <?php if(isset($cours['niveau']) && $cours['niveau'] == 'ING5_Cyber') echo 'selected'; ?>>ING5 - CyberSécurité</option>
+          <option value="ING5_Finance" <?php if(isset($cours['niveau']) && $cours['niveau'] == 'ING5_Finance') echo 'selected'; ?>>ING5 - Finance</option>
+          <option value="ING5_Energie" <?php if(isset($cours['niveau']) && $cours['niveau'] == 'ING5_Energie') echo 'selected'; ?>>ING5 - Energie</option>
+        </select>
+      </div>
+      
+      <div class="input-group">
+        <label>Département</label>
+        <select id="dep_cours" name="modif_dep" required>
+          <option value="">-- Selectionnez --</option>
+          <option value="Informatique" <?php if(isset($cours['departement']) && $cours['departement'] == 'Informatique') echo 'selected'; ?>>Informatique</option>
+          <option value="Mathématique" <?php if(isset($cours['departement']) && $cours['departement'] == 'Mathématique') echo 'selected'; ?>>Mathématique</option>
+          <option value="Physique" <?php if(isset($cours['departement']) && $cours['departement'] == 'Physique') echo 'selected'; ?>>Physique</option>
+          <option value="Electronique" <?php if(isset($cours['departement']) && $cours['departement'] == 'Electronique') echo 'selected'; ?>>Electronique</option>
+          <option value="Anglais" <?php if(isset($cours['departement']) && $cours['departement'] == 'Anglais') echo 'selected'; ?>>Anglais</option>
+          <option value="Espagnol" <?php if(isset($cours['departement']) && $cours['departement'] == 'Espagnol') echo 'selected'; ?>>Espagnol</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label for="prof_cours">Associer un enseignant</label>
+        <select id="prof_cours" name="modif_prof" style="background-color: #f9f9f9; border-left: 3px solid #0056b3;">
+          <option value="">-- Choisissez d'abord une catégorie --</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label for="date_cours">Date</label>
+        <input type="date" id="date_cours" name="date_cours" value="<?php echo isset($cours['date_cours']) ? htmlspecialchars($cours['date_cours']) : ''; ?>" required>
+      </div>
+
+      <div class="input-group">
+        <label for="horaire_cours">Horaire</label>
+        <select id="horaire_cours" name="horaire_cours" required>
+          <option value="">-- Selectionnez --</option>
+          <option value="8h00" <?php if(isset($cours['heure']) && $cours['heure'] == '8h00') echo 'selected'; ?>>8:00 - 10:00</option>
+          <option value="10h00" <?php if(isset($cours['heure']) && $cours['heure'] == '10h00') echo 'selected'; ?>>10:00 - 12:00</option>
+          <option value="12h30" <?php if(isset($cours['heure']) && $cours['heure'] == '12h30') echo 'selected'; ?>>12:30 - 14:30</option>
+          <option value="14h30" <?php if(isset($cours['heure']) && $cours['heure'] == '14h30') echo 'selected'; ?>>14:30 - 16:30</option>
+          <option value="17h00" <?php if(isset($cours['heure']) && $cours['heure'] == '17h00') echo 'selected'; ?>>17:00 - 19:00</option>
+        </select>
+      </div>
+      
+      <div class="input-group">
+        <label for="filtre_salle_cours">Salle de cours</label>
+        <select id="filtre_salle_cours" name="Salle" required style="width:100%; padding:10px; border:1px solid #ccc; border-radius:5px;">
+          <option value="">-- Sélectionner une salle --</option>
+          <option value="EM01" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'EM01') echo 'selected'; ?>>EM01</option>
+          <option value="EM02" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'EM02') echo 'selected'; ?>>EM02</option>
+          <option value="EM03" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'EM03') echo 'selected'; ?>>EM03</option>
+          <option value="EM04" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'EM04') echo 'selected'; ?>>EM04</option>
+          <option value="EM05" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'EM05') echo 'selected'; ?>>EM05</option>
+          <option value="EM06" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'EM06') echo 'selected'; ?>>EM06</option>
+          <option value="EM07" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'EM07') echo 'selected'; ?>>EM07</option>
+          <option value="EM08" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'EM08') echo 'selected'; ?>>EM08</option>
+          <option value="EM09" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'EM09') echo 'selected'; ?>>EM09</option>
+          <option value="EM10" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'EM10') echo 'selected'; ?>>EM10</option>
+          <option value="EM11" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'EM11') echo 'selected'; ?>>EM11</option>
+          <option value="EM12" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'EM12') echo 'selected'; ?>>EM12</option>
+          <option value="EM13" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'EM13') echo 'selected'; ?>>EM13</option>
+          <option value="EM14" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'EM14') echo 'selected'; ?>>EM14</option>
+          <option value="EM15" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'EM15') echo 'selected'; ?>>EM15</option>
+          <option value="EM16" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'EM16') echo 'selected'; ?>>EM16</option>
+          <option value="EM17" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'EM17') echo 'selected'; ?>>EM17</option>
+          <option value="EM18" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'EM18') echo 'selected'; ?>>EM18</option>
+          <option value="EM19" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'EM19') echo 'selected'; ?>>EM19</option>
+          <option value="EM20" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'EM20') echo 'selected'; ?>>EM20</option>
+          <option value="SC01" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'SC01') echo 'selected'; ?>>SC01</option>
+          <option value="SC02" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'SC02') echo 'selected'; ?>>SC02</option>
+          <option value="SC03" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'SC03') echo 'selected'; ?>>SC03</option>
+          <option value="SC04" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'SC04') echo 'selected'; ?>>SC04</option>
+          <option value="SC05" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'SC05') echo 'selected'; ?>>SC05</option>
+          <option value="SC06" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'SC06') echo 'selected'; ?>>SC06</option>
+          <option value="SC07" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'SC07') echo 'selected'; ?>>SC07</option>
+          <option value="SC08" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'SC08') echo 'selected'; ?>>SC08</option>
+          <option value="SC09" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'SC09') echo 'selected'; ?>>SC09</option>
+          <option value="SC10" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'SC10') echo 'selected'; ?>>SC10</option>
+          <option value="SC11" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'SC11') echo 'selected'; ?>>SC11</option>
+          <option value="SC12" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'SC12') echo 'selected'; ?>>SC12</option>
+          <option value="SC13" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'SC13') echo 'selected'; ?>>SC13</option>
+          <option value="SC14" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'SC14') echo 'selected'; ?>>SC14</option>
+          <option value="SC15" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'SC15') echo 'selected'; ?>>SC15</option>
+          <option value="SC16" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'SC16') echo 'selected'; ?>>SC16</option>
+          <option value="SC17" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'SC17') echo 'selected'; ?>>SC17</option>
+          <option value="SC18" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'SC18') echo 'selected'; ?>>SC18</option>
+          <option value="SC19" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'SC19') echo 'selected'; ?>>SC19</option>
+          <option value="SC20" <?php if(isset($cours['Salle']) && $cours['Salle'] == 'SC20') echo 'selected'; ?>>SC20</option>
+        </select>
+      </div>
+             
+      <button type="submit" name="button_modifier_cours" style="width: 100%; background: #0056b3; color: white; padding: 12px; border: none; border-radius: 7px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 20px;">
+        Enregistrer les modifications
+      </button>
+    </form>
+
+    <?php
+    // --- PRÉPARATION DES DONNÉES EN PHP POUR LE JAVASCRIPT ---
+    $sql_profs_filtre = "SELECT id_enseignant, nom, prenom, departement FROM ENSEIGNANT WHERE departement IS NOT NULL";
+    $res_profs_filtre = mysqli_query($conn, $sql_profs_filtre);
+    $dictionnaire_profs = [];
+    
+    if ($res_profs_filtre) {
+        while ($p = mysqli_fetch_assoc($res_profs_filtre)) {
+            $dept = $p['departement'];
+            if (!isset($dictionnaire_profs[$dept])) {
+                $dictionnaire_profs[$dept] = [];
+            }
+            $dictionnaire_profs[$dept][] = [
+                'id' => $p['id_enseignant'],
+                'nom' => htmlspecialchars($p['nom'] . ' ' . $p['prenom'])
+            ];
+        }
+    }
+    ?>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          const profsParDept = <?php echo json_encode($dictionnaire_profs); ?>;
+          
+          const selectCategorie = document.getElementById('dep_cours');
+          const selectProf = document.getElementById('prof_cours');
+
+          // Permet de pré-sélectionner le professeur actuellement enregistré pour ce cours au premier chargement
+          const currentProfId = "<?php echo isset($cours['id_enseignant']) ? $cours['id_enseignant'] : ''; ?>";
+
+          function mettreAJourProfs() {
+              const categorieChoisie = selectCategorie.value;
+              
+              selectProf.innerHTML = '<option value="">-- Aucun enseignant sélectionné --</option>';
+              
+              if(categorieChoisie && profsParDept[categorieChoisie]) {
+                  const profs = profsParDept[categorieChoisie];
+                  
+                  profs.forEach(function(prof) {
+                      const option = document.createElement('option');
+                      option.value = prof.id;
+                      option.textContent = prof.nom;
+                      
+                      // Si l'ID du prof correspond à celui du cours, on le sélectionne
+                      if(prof.id == currentProfId) {
+                          option.selected = true;
+                      }
+                      
+                      selectProf.appendChild(option);
+                  });
+              } else if (categorieChoisie) {
+                  selectProf.innerHTML = '<option value="">-- Aucun prof disponible pour cette matière --</option>';
+              } else {
+                  selectProf.innerHTML = '<option value="">-- Choisissez d\'abord une catégorie --</option>';
+              }
+          }
+
+          if(selectCategorie && selectProf) {
+              // On exécute la fonction une fois au chargement pour afficher le prof actuel si le département est déjà choisi
+              mettreAJourProfs();
+
+              // On écoute les changements futurs
+              selectCategorie.addEventListener('change', mettreAJourProfs);
+          }
+      });
+    </script>
+  </div>
+
+</body>
+</html>
