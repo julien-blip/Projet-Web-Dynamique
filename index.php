@@ -934,3 +934,195 @@ echo '</tr>';
           }
           ?>
 
+
+			  <div class="presences">
+    <div class="contenu2">
+      <div class="haut12">
+        <div class="gauche">
+          <strong>PRÉSENCES</strong>
+        </div>
+      </div>
+      
+      <div class="container-presences">
+        <div class="liste-presences">
+          <h2>Historique récent</h2>
+          
+          <div class="item-presence present">
+            <div class="date-cours">
+              <strong>Aujourd'hui</strong><br>
+              Informatique - 10:00
+            </div>
+            <div class="statut-badge">Présent</div>
+          </div>
+
+          <div class="item-presence absent">
+            <div class="date-cours">
+              <strong>Lundi 14 Octobre</strong><br>
+              Mathématiques - 08:00
+            </div>
+            <div class="statut-badge">Absent</div>
+          </div>
+
+          <div class="item-presence present">
+            <div class="date-cours">
+              <strong>Vendredi 11 Octobre</strong><br>
+              Anglais - 14:30
+            </div>
+            <div class="statut-badge">Présent</div>
+          </div>
+
+          <div class="item-presence present">
+            <div class="date-cours">
+              <strong>Mercredi 9 Octobre</strong><br>
+              Physique - 10:00
+            </div>
+            <div class="statut-badge">Présent</div>
+          </div>
+          
+          <div class="item-presence absent">
+            <div class="date-cours">
+              <strong>Mardi 8 Octobre</strong><br>
+              Sport - 14:30
+            </div>
+            <div class="statut-badge">Absent</div>
+          </div>
+        </div>
+
+        <div class="stats-presences">
+          <h2>Bilan du semestre</h2>
+          
+          <div class="camembert"></div>
+          
+          <div class="legende">
+            <div><span class="dot-present"></span> <strong>Présent :</strong> 85% (34 cours)</div>
+            <div><span class="dot-absent"></span> <strong>Absent :</strong> 15% (6 cours)</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="parametres">
+    <div class="contenu2">
+      <div class="haut12">
+        <div class="gauche">
+          <strong>PARAMÈTRES DU COMPTE</strong>
+        </div>
+      </div>
+      
+      <?php
+      // 1. Récupération des informations réelles de l'étudiant connecté
+      $info_etudiant = [];
+      if ($role_actuel == 'Etudiant' && $id_actuel) {
+          $sql_profil = "SELECT E.*, C.email, C.telephone 
+                         FROM ETUDIANT E 
+                         LEFT JOIN COMPTE_UTILISATEUR C ON E.id_compte = C.id_compte 
+                         WHERE E.id_etudiant = ?";
+          $stmt_profil = mysqli_prepare($conn, $sql_profil);
+          mysqli_stmt_bind_param($stmt_profil, "i", $id_actuel);
+          mysqli_stmt_execute($stmt_profil);
+          $res_profil = mysqli_stmt_get_result($stmt_profil);
+          if ($row = mysqli_fetch_assoc($res_profil)) {
+              $info_etudiant = $row;
+          }
+      }
+      ?>
+
+      <div class="container-parametres" style="padding: 20px; background-color: #fff; border-radius: 8px; margin-top: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+        <h2 style="margin-bottom: 20px; color: #333;">Mes Informations Personnelles</h2>
+        
+        <div id="vue_lecture_profil">
+            <div class="infos-profil" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px;">
+              <div><strong>Nom :</strong> <br><span><?php echo htmlspecialchars($info_etudiant['nom'] ?? 'Non défini'); ?></span></div>
+              <div><strong>Prénom :</strong> <br><span><?php echo htmlspecialchars($info_etudiant['prenom'] ?? 'Non défini'); ?></span></div>
+              <div><strong>ID ÉTUDIANT :</strong> <br><span><?php echo htmlspecialchars($info_etudiant['numero_etudiant'] ?? 'Non défini'); ?></span></div>
+              <div><strong>Email :</strong> <br><span><?php echo htmlspecialchars($info_etudiant['email_etu'] ?? 'Non défini'); ?></span></div>
+              <div><strong>Téléphone :</strong> <br><span><?php echo htmlspecialchars($info_etudiant['telephone'] ?? 'Non défini'); ?></span></div>
+              <div><strong>Date de naissance :</strong> <br><span><?php echo htmlspecialchars($info_etudiant['date_naissance'] ?? 'Non définie'); ?></span></div>
+              <div><strong>Genre :</strong> <br><span><?php echo htmlspecialchars($info_etudiant['genre'] ?? 'Non défini'); ?></span></div>
+              <div><strong>Adresse :</strong> <br><span><?php echo htmlspecialchars($info_etudiant['adresse'] ?? 'Non définie'); ?></span></div>
+              <div><strong>Nationalité :</strong> <br><span><?php echo htmlspecialchars($info_etudiant['nationalite'] ?? 'Non définie'); ?></span></div>
+              <div><strong>Niveau :</strong> <br><span><?php echo htmlspecialchars($info_etudiant['niveau'] ?? 'Non défini'); ?></span></div>
+              <div><strong>Année académique :</strong> <br><span><?php echo htmlspecialchars($info_etudiant['annee_academique'] ?? 'Non définie'); ?></span></div>
+            </div>
+
+            <div class="actions-parametres" style="text-align: right; margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px;">
+              <button id="btn_modifier_profil" class="btn-submit" style="padding: 10px 20px; background-color: #0056b3; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
+                Modifier mes informations
+              </button>
+            </div>
+        </div>
+
+        <div id="vue_modification_profil" style="display: none;">
+            <form method="post" action="modifier_mon_profil.php">
+                <input type="hidden" name="id_etudiant" value="<?php echo $id_actuel; ?>">
+                
+                <div class="infos-profil" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px;">
+                    
+                    <div class="input-group">
+                        <label>Nom (Bloqué par la scolarité)</label>
+                        <input type="text" value="<?php echo htmlspecialchars($info_etudiant['nom'] ?? ''); ?>" readonly style="background-color: #e9ecef; cursor: not-allowed; border: 1px solid #ccc; padding: 10px; border-radius: 5px; width: 100%; box-sizing: border-box;">
+                    </div>
+                    <div class="input-group">
+                        <label>Prénom (Bloqué par la scolarité)</label>
+                        <input type="text" value="<?php echo htmlspecialchars($info_etudiant['prenom'] ?? ''); ?>" readonly style="background-color: #e9ecef; cursor: not-allowed; border: 1px solid #ccc; padding: 10px; border-radius: 5px; width: 100%; box-sizing: border-box;">
+                    </div>
+                    <div class="input-group">
+                        <label>N° Étudiant (Bloqué)</label>
+                        <input type="text" value="<?php echo htmlspecialchars($info_etudiant['numero_etudiant'] ?? ''); ?>" readonly style="background-color: #e9ecef; cursor: not-allowed; border: 1px solid #ccc; padding: 10px; border-radius: 5px; width: 100%; box-sizing: border-box;">
+                    </div>
+                    <div class="input-group">
+                        <label>Email académique (Bloqué)</label>
+                        <input type="email" value="<?php echo htmlspecialchars($info_etudiant['email_etu'] ?? ''); ?>" readonly style="background-color: #e9ecef; cursor: not-allowed; border: 1px solid #ccc; padding: 10px; border-radius: 5px; width: 100%; box-sizing: border-box;">
+                    </div>
+                    <div class="input-group">
+                        <label>Niveau (Bloqué)</label>
+                        <input type="text" value="<?php echo htmlspecialchars($info_etudiant['niveau'] ?? ''); ?>" readonly style="background-color: #e9ecef; cursor: not-allowed; border: 1px solid #ccc; padding: 10px; border-radius: 5px; width: 100%; box-sizing: border-box;">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Téléphone</label>
+                        <input type="tel" name="maj_telephone" value="<?php echo htmlspecialchars($info_etudiant['telephone'] ?? ''); ?>" style="border: 1px solid #0056b3; padding: 10px; border-radius: 5px; width: 100%; box-sizing: border-box;">
+                    </div>
+                    <div class="input-group" style="grid-column: span 2;">
+                        <label>Adresse Postale</label>
+                        <input type="text" name="maj_adresse" value="<?php echo htmlspecialchars($info_etudiant['adresse'] ?? ''); ?>" style="border: 1px solid #0056b3; padding: 10px; border-radius: 5px; width: 100%; box-sizing: border-box;">
+                    </div>
+                </div>
+
+                <div class="actions-parametres" style="text-align: right; border-top: 1px solid #eee; padding-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" id="btn_annuler_profil" style="padding: 10px 20px; background-color: #CDCDCD; color: #333; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
+                        Annuler
+                    </button>
+                    <button type="submit" name="btn_sauvegarder_profil" style="padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
+                        Enregistrer les modifications
+                    </button>
+                </div>
+            </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Petit script JavaScript pour basculer de la vue lecture au formulaire
+    document.addEventListener('DOMContentLoaded', function() {
+        const btnModifier = document.getElementById('btn_modifier_profil');
+        const btnAnnuler = document.getElementById('btn_annuler_profil');
+        const vueLecture = document.getElementById('vue_lecture_profil');
+        const vueModif = document.getElementById('vue_modification_profil');
+
+        if(btnModifier && btnAnnuler && vueLecture && vueModif) {
+            btnModifier.addEventListener('click', function() {
+                vueLecture.style.display = 'none';
+                vueModif.style.display = 'block';
+            });
+            btnAnnuler.addEventListener('click', function() {
+                vueModif.style.display = 'none';
+                vueLecture.style.display = 'block';
+            });
+        }
+    });
+  </script>
+
