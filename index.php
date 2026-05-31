@@ -2106,3 +2106,368 @@ if (mysqli_fetch_row(mysqli_stmt_get_result($s_verr))) {
               </div>
             </div>
           </div>
+ <form method="POST" action="ajouter_notes.php" id="form_notes_prof">
+            <input type="hidden" name="id_cours"        value="<?php echo $id_cours_choisi; ?>">
+            <input type="hidden" name="type_eval"       value="<?php echo htmlspecialchars($type_choisi); ?>">
+            <input type="hidden" name="coefficient"     value="<?php echo $TYPES_EVAL[$type_choisi]['coef']; ?>">
+            <input type="hidden" name="id_prof_retour"  value="<?php echo $id_actuel; ?>">
+
+            <table style="width:100%; border-collapse:collapse; text-align:left;">
+              <thead>
+                <tr style="background:#f0f4fa; color:#0056b3; font-size:13px; text-transform:uppercase; letter-spacing:.3px;">
+                  <th style="padding:12px 14px; border-radius:8px 0 0 0; width:130px;">N° Étudiant</th>
+                  <th style="padding:12px 14px;">Étudiant</th>
+                  <th style="padding:12px 14px; text-align:center; width:120px;">Note /20</th>
+                  <th style="padding:12px 14px; border-radius:0 8px 0 0;">Commentaire</th>
+                </tr>
+              </thead>
+              <tbody>
+<?php
+$sql_etu = "SELECT e.id_etudiant, e.nom, e.prenom, e.numero_etudiant
+            FROM inscription i
+            JOIN etudiant e ON i.id_etudiant = e.id_etudiant
+            WHERE i.id_cours = ?
+            ORDER BY e.nom ASC, e.prenom ASC";
+$stmt_etu = mysqli_prepare($conn, $sql_etu);
+mysqli_stmt_bind_param($stmt_etu, "i", $id_cours_choisi);
+mysqli_stmt_execute($stmt_etu);
+$res_etu = mysqli_stmt_get_result($stmt_etu);
+
+// Récupérer TOUTES les notes existantes pour ce cours/type en une seule requête
+$sql_notes_ex = "SELECT id_note, id_etudiant, note, commentaire
+                 FROM note
+                 WHERE id_cours = ? AND evaluation = ?
+                 ORDER BY id_note ASC";
+$stmt_nex = mysqli_prepare($conn, $sql_notes_ex);
+mysqli_stmt_bind_param($stmt_nex, "is", $id_cours_choisi, $type_choisi);
+mysqli_stmt_execute($stmt_nex);
+$res_nex = mysqli_stmt_get_result($stmt_nex);
+
+// Regrouper les notes par étudiant : $notes_par_etu[id_etudiant] = [ [id_note, note, commentaire], ... ]
+$notes_par_etu = [];
+while ($row_nex = mysqli_fetch_assoc($res_nex)) {
+    $notes_par_etu[$row_nex['id_etudiant']][] = $row_nex;
+}
+
+$ligne = 0;
+while ($etu = mysqli_fetch_assoc($res_etu)):
+    $id_etu    = $etu['id_etudiant'];
+    $initiales = strtoupper(mb_substr($etu['prenom'],0,1) . mb_substr($etu['nom'],0,1));
+    $bg        = ($ligne % 2 === 0) ? '#ffffff' : '#fafbfd';
+    $ligne++;
+
+    $notes_existantes = $notes_par_etu[$id_etu] ?? [];
+?>
+<tr style="background:<?php echo $bg; ?>; border-bottom:2px solid #e8ecf0;">
+  <td style="padding:12px 14px; color:#888; font-size:13px; vertical-align:top;">
+    <?php echo htmlspecialchars($etu['numero_etudiant']); ?>
+  </td>
+  <td style="padding:12px 14px; vertical-align:top;">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <span style="width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,#0056b3,#2196f3); color:white; display:inline-flex; align-items:center; justify-content:center; font-size:13px; font-weight:bold; flex-shrink:0;">
+        <?php echo $initiales; ?>
+      </span>
+      <strong style="color:#222; font-size:14px;"><?php echo htmlspecialchars($etu['prenom'].' '.$etu['nom']); ?></strong>
+    </div>
+  </td>
+
+  <td colspan="2" style="padding:10px 14px; vertical-align:top;">
+
+    <!-- ── Notes existantes (modifiables) ── -->
+    <?php foreach ($notes_existantes as $idx => $ne):
+        $nf = (float)$ne['note'];
+        $col = $nf >= 10 ? '#28a745' : '#cc0000';
+        $num = $idx + 1;
+    ?>
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px; background:#f8f9fa; border-radius:8px; padding:8px 12px; border-left:3px solid <?php echo $col; ?>;">
+      <span style="font-size:12px; color:#888; white-space:nowrap; min-width:55px;">Note <?php echo $num; ?> :</span>
+      <input type="hidden" name="ids_notes[<?php echo $id_etu; ?>_<?php echo $idx; ?>]" value="<?php echo $ne['id_note']; ?>">
+      
+      <input type="number"
+        name="notes[<?php echo $id_etu; ?>_<?php echo $idx; ?>]"
+        value="<?php echo htmlspecialchars($ne['note']); ?>"
+        min="0" max="20" step="0.5"
+        class="champ-note"
+        <?php echo $est_verrouille ? 'readonly style="background:#e9ecef; cursor:not-allowed;' : 'style="'; ?> width:72px; padding:7px 5px; border:2px solid <?php echo $col; ?>; border-radius:7px; text-align:center; font-weight:bold; font-size:14px;">
+      
+      <input type="text"
+        name="commentaires[<?php echo $id_etu; ?>_<?php echo $idx; ?>]"
+        value="<?php echo htmlspecialchars($ne['commentaire'] ?? ''); ?>"
+        placeholder="Appréciation…"
+        <?php echo $est_verrouille ? 'readonly style="background:#e9ecef; cursor:not-allowed;' : 'style="'; ?> flex:1; padding:7px 10px; border:1px solid #ddd; border-radius:7px; font-size:13px;">
+      
+      <?php if (!$est_verrouille): ?>
+      <a href="supprimer_note.php?id_note=<?php echo $ne['id_note']; ?>&id_prof=<?php echo $id_actuel; ?>&id_cours=<?php echo $id_cours_choisi; ?>&type_eval=<?php echo urlencode($type_choisi); ?>"
+         onclick="return confirm('Supprimer cette note ?')"
+         style="color:#cc0000; font-size:18px; text-decoration:none; font-weight:bold; padding:0 4px;" title="Supprimer">✕</a>
+      <?php endif; ?>
+    </div>
+    <?php endforeach; ?>
+
+    <?php if (!$est_verrouille): ?>
+    <div style="display:flex; align-items:center; gap:8px; background:#f0f5ff; border-radius:8px; padding:8px 12px; border:1px dashed #0056b3;">
+      <span style="font-size:12px; color:#0056b3; white-space:nowrap; min-width:55px;">+ Nouvelle :</span>
+      <input type="number"
+        name="notes[<?php echo $id_etu; ?>_new]"
+        min="0" max="20" step="0.5"
+        class="champ-note"
+        placeholder="—"
+        style="width:72px; padding:7px 5px; border:2px solid #c0d4f0; border-radius:7px; text-align:center; font-weight:bold; font-size:14px;">
+      <input type="text"
+        name="commentaires[<?php echo $id_etu; ?>_new]"
+        placeholder="Appréciation…"
+        style="flex:1; padding:7px 10px; border:1px solid #c0d4f0; border-radius:7px; font-size:13px;">
+    </div>
+    <?php endif; ?>
+
+  </td>
+</tr>
+<?php endwhile; ?>
+</tbody>
+            </table>
+
+            <!-- Bouton bas de tableau -->
+            <!-- Bouton bas de tableau -->
+            <div style="display:flex; justify-content:flex-end; align-items: center; gap: 15px; margin-top:16px; padding-top:14px; border-top:1px solid #f0f0f0;">
+              
+              <?php if ($est_verrouille): ?>
+                <div style="color: #dc3545; font-weight: bold; font-size: 16px; background: #ffe6e6; padding: 10px 20px; border-radius: 8px;">
+                  🔒 Cette évaluation est verrouillée. Aucune modification n'est possible.
+                </div>
+              <?php else: ?>
+                <!-- Bouton Enregistrer existant -->
+                <button type="submit" name="btn_action" value="enregistrer"
+                  style="background:#28a745; color:white; padding:12px 28px; border:none; border-radius:8px; cursor:pointer; font-weight:bold; font-size:15px; display:flex; align-items:center; gap:8px; box-shadow:0 3px 10px rgba(40,167,69,0.3);">
+                  💾 Enregistrer
+                </button>
+
+                <button type="submit" name="btn_action" value="verrouiller"
+                  onclick="return confirm('⚠️ ATTENTION : Voulez-vous vraiment enregistrer ET verrouiller cette évaluation ? Toute modification ou ajout de note sera définitivement impossible après cela.');" 
+                  style="background:#dc3545; color:white; padding:12px 28px; border:none; border-radius:8px; cursor:pointer; font-weight:bold; font-size:15px; display:flex; align-items:center; gap:8px; box-shadow:0 3px 10px rgba(220,53,69,0.3);">
+                  🔒 Enregistrer et Verrouiller
+                </button>
+              <?php endif; ?>
+
+            </div>
+          </form>
+        </div>
+
+        <?php else: ?>
+        <!-- Invite à choisir un type d'évaluation -->
+        <div style="margin-top:20px; background:white; border-radius:12px; padding:40px 20px; text-align:center; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+          <div style="font-size:44px; margin-bottom:12px;">📋</div>
+          <strong style="font-size:17px; color:#333;">Choisissez un type d'évaluation</strong><br>
+          <p style="color:#666; margin-top:8px; font-size:14px;">Sélectionnez le type d'évaluation dans le menu ci-dessus pour saisir ou consulter les notes.</p>
+          <!-- Raccourcis rapides -->
+          <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top:20px;">
+            <?php foreach ($TYPES_EVAL as $cle => $info):
+                $url = "index.php?role_simule=Professeur&id={$id_actuel}&onglet=notes&id_cours_prof={$id_cours_choisi}&type_eval=".urlencode($cle);
+                $hasDeja = isset($bilan_evals[$cle]);
+            ?>
+            <a href="<?php echo $url; ?>" style="
+                text-decoration:none; padding:12px 20px; border-radius:10px;
+                border:2px solid <?php echo $hasDeja ? '#28a745' : '#0056b3'; ?>;
+                background:<?php echo $hasDeja ? '#e6f7ec' : '#e8f0fb'; ?>;
+                color:<?php echo $hasDeja ? '#28a745' : '#0056b3'; ?>;
+                font-weight:bold; font-size:14px; display:flex; flex-direction:column; align-items:center; gap:4px; min-width:130px;">
+              <?php echo htmlspecialchars($info['label']); ?>
+              <span style="font-size:11px; font-weight:normal; opacity:.8;">
+                coef <?php echo $info['coef']; ?>
+                <?php if ($hasDeja): ?> · ✅ <?php echo $bilan_evals[$cle]['nb_notes']; ?> notes<?php endif; ?>
+              </span>
+            </a>
+            <?php endforeach; ?>
+          </div>
+        </div>
+        <?php endif; ?>
+
+      <?php else: ?>
+      <!-- Pas de cours sélectionné -->
+      <div style="margin-top:30px; background:white; border-radius:12px; padding:60px 20px; text-align:center; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+        <div style="font-size:50px; margin-bottom:15px;">📝</div>
+        <strong style="font-size:18px; color:#333;">Sélectionnez un cours</strong><br>
+        <p style="color:#666; margin-top:8px;">Choisissez l'un de vos cours dans le menu ci-dessus pour commencer à gérer les notes.</p>
+      </div>
+      <?php endif; ?>
+
+    </div>
+  </div>
+</div>
+<div class="presences-prof" style="display: none;">
+    <div class="contenu1">
+      <div id="vue_saisie_presences">
+        <div class="haut1">
+          <div class="gauche">
+            <strong>Faire l'appel</strong>
+            <br><span style="font-size: 14px; font-weight: normal; color: #555;">Cours : Algorithmique Avancée (INFO-301) - Date : Aujourd'hui</span>
+          </div>
+          <div class="droite">
+            <div class="btn">
+              <div id="Enregistrer_presences" style="background-color: #007bff; color: white; padding: 10px 15px; border-radius: 5px; cursor: pointer;">
+                <img src="plus.png" height="15" alt="Save" style="filter: brightness(0) invert(1);"> Valider les présences
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grille-presence-prof" style="margin-top: 20px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+          <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+              <tr style="border-bottom: 2px solid #eee; color: #333;">
+                <th style="padding: 12px 10px;">ID Étudiant</th>
+                <th style="padding: 12px 10px;">Nom Complet</th>
+                <th style="padding: 12px 10px; text-align: center;">Présent (Oui)</th>
+                <th style="padding: 12px 10px; text-align: center;">Absent (Non)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid #eee;">
+                <td style="padding: 12px 10px; color: #666;">E-2023-14</td>
+                <td style="padding: 12px 10px;"><strong>Emma Martin</strong></td>
+                <td style="padding: 12px 10px; text-align: center;">
+                  <input type="radio" name="presence_E202314" value="oui" checked style="transform: scale(1.5); cursor: pointer;">
+                </td>
+                <td style="padding: 12px 10px; text-align: center;">
+                  <input type="radio" name="presence_E202314" value="non" style="transform: scale(1.5); cursor: pointer;">
+                </td>
+              </tr>
+              <tr style="border-bottom: 1px solid #eee;">
+                <td style="padding: 12px 10px; color: #666;">E-2023-15</td>
+                <td style="padding: 12px 10px;"><strong>Lucas Bernard</strong></td>
+                <td style="padding: 12px 10px; text-align: center;">
+                  <input type="radio" name="presence_E202315" value="oui" style="transform: scale(1.5); cursor: pointer;">
+                </td>
+                <td style="padding: 12px 10px; text-align: center;">
+                  <input type="radio" name="presence_E202315" value="non" checked style="transform: scale(1.5); cursor: pointer;">
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="liste-etudiants-prof" style="display: none;">
+  <div class="contenu1">
+    
+    <?php
+    // On récupère l'ID du cours s'il a été sélectionné via le menu déroulant
+    $id_cours_liste = isset($_GET['id_cours_liste']) ? intval($_GET['id_cours_liste']) : 0;
+    ?>
+
+    <div class="haut1">
+      <div class="gauche">
+        <strong>Mes Étudiants Inscrits</strong>
+        <br>
+        <select onchange="window.location.href='index.php?role_simule=Professeur&id=<?php echo $id_actuel; ?>&onglet=liste_etu&id_cours_liste='+this.value;" style="margin-top: 5px; padding: 5px; border-radius: 5px; border: 1px solid #ccc; font-weight: bold; color: #333;">
+          <option value="">-- Sélectionnez un de vos cours --</option>
+          <?php
+          if ($role_actuel == 'Professeur' && $id_actuel) {
+              // Requête pour lister les cours assignés à CE professeur
+              $req_mes_cours = mysqli_prepare($conn, "SELECT id_cours, nom_matiere, code_cours FROM cours WHERE id_enseignant = ?");
+              mysqli_stmt_bind_param($req_mes_cours, "i", $id_actuel);
+              mysqli_stmt_execute($req_mes_cours);
+              $res_mes_cours = mysqli_stmt_get_result($req_mes_cours);
+              
+              while ($mc = mysqli_fetch_assoc($res_mes_cours)) {
+                  $selected = ($mc['id_cours'] == $id_cours_liste) ? 'selected' : '';
+                  echo '<option value="'.$mc['id_cours'].'" '.$selected.'>'.htmlspecialchars($mc['nom_matiere'].' ('.$mc['code_cours'].')').'</option>';
+              }
+          }
+          ?>
+        </select>
+      </div>
+    </div>
+
+    <div class="grille-liste-etu" style="margin-top: 20px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+      <?php if ($id_cours_liste > 0): ?>
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+          <thead>
+            <tr style="border-bottom: 2px solid #eee; background: #0056b3; color: white;">
+              <th style="padding: 12px; border-radius: 5px 0 0 0;">N° Étudiant</th>
+              <th style="padding: 12px;">Nom</th>
+              <th style="padding: 12px;">Prénom</th>
+              <th style="padding: 12px; border-radius: 0 5px 0 0;">Email</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php
+            // La requête magique : On joint INSCRIPTION et ETUDIANT en filtrant par le cours
+            $sql_inscrits = "SELECT e.numero_etudiant, e.nom, e.prenom, e.email_etu 
+                             FROM inscription i
+                             JOIN etudiant e ON i.id_etudiant = e.id_etudiant
+                             WHERE i.id_cours = ?
+                             ORDER BY e.nom ASC, e.prenom ASC";
+                             
+            $stmt_inscrits = mysqli_prepare($conn, $sql_inscrits);
+            
+            if ($stmt_inscrits) {
+                mysqli_stmt_bind_param($stmt_inscrits, "i", $id_cours_liste);
+                mysqli_stmt_execute($stmt_inscrits);
+                $res_inscrits = mysqli_stmt_get_result($stmt_inscrits);
+
+                if (mysqli_num_rows($res_inscrits) > 0) {
+                    // On boucle pour afficher chaque étudiant trouvé
+                    while ($etu = mysqli_fetch_assoc($res_inscrits)) {
+                        echo '<tr style="border-bottom: 1px solid #eee;">';
+                        echo '  <td style="padding: 12px; color: #666;">' . htmlspecialchars($etu['numero_etudiant']) . '</td>';
+                        echo '  <td style="padding: 12px; font-weight: bold;">' . htmlspecialchars($etu['nom']) . '</td>';
+                        echo '  <td style="padding: 12px;">' . htmlspecialchars($etu['prenom']) . '</td>';
+                        echo '  <td style="padding: 12px; color: #0056b3;">' . htmlspecialchars($etu['email_etu'] ?? 'Non renseigné') . '</td>';
+                        echo '</tr>';
+                    }
+                } else {
+                    echo "<tr><td colspan='4' style='padding: 20px; text-align: center; color: #666;'>Aucun étudiant n'est inscrit à ce cours pour le moment.</td></tr>";
+                }
+            } else {
+                echo "<tr><td colspan='4' style='color:red;'>Erreur SQL : " . mysqli_error($conn) . "</td></tr>";
+            }
+            ?>
+          </tbody>
+        </table>
+      <?php else: ?>
+        <div style="text-align: center; padding: 40px; color: #666; font-style: italic;">
+          👆 Veuillez sélectionner un de vos cours dans le menu déroulant ci-dessus pour afficher la liste de vos étudiants.
+        </div>
+      <?php endif; ?>
+    </div>
+  </div>
+</div>
+<?php if (isset($_GET['onglet']) && $_GET['onglet'] == 'notes') { ?>
+  <script>
+    window.addEventListener('load', function() {
+        setTimeout(function() {
+            document.querySelectorAll('.page, .emploi, .notation, .messagerie, .presences, .parametres, .enseignants, .cours-admin, .inscriptions-admin, .notation_prof, .presences-prof, .vue-tb-admin, .vue-tb-prof, .vue-tb-etudiant, .page-cours-etudiant').forEach(el => { if(el) el.style.display = 'none'; });
+            let np = document.querySelector('.notation_prof');
+            if(np) np.style.display = 'block';
+        }, 150); 
+    });
+  </script>
+<?php } ?>
+
+<?php if (isset($_GET['onglet']) && $_GET['onglet'] == 'liste_etu') { ?>
+  <script>
+    window.addEventListener('load', function() {
+        setTimeout(function() {
+            document.querySelectorAll('.page, .emploi, .notation, .messagerie, .presences, .parametres, .enseignants, .cours-admin, .inscriptions-admin, .notation_prof, .presences-prof, .vue-tb-admin, .vue-tb-prof, .vue-tb-etudiant, .page-cours-etudiant').forEach(el => { if(el) el.style.display = 'none'; });
+            let listeEtu = document.querySelector('.liste-etudiants-prof');
+            if(listeEtu) listeEtu.style.display = 'block';
+        }, 150); 
+    });
+  </script>
+<?php } ?>
+  <div id="modal_edt_prof" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:99999; justify-content:center; align-items:center;">
+  <div style="background:white; border-radius:12px; padding:30px; width:700px; max-width:90%; max-height:80vh; overflow-y:auto; position:relative;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:2px solid #eee; padding-bottom:15px;">
+      <h3 id="titre_modal_edt" style="margin:0; color:#0056b3;"></h3>
+      <button onclick="document.getElementById('modal_edt_prof').style.display='none';" style="background:#CDCDCD; border:none; padding:8px 15px; border-radius:5px; cursor:pointer; font-weight:bold; font-size:16px;">✕</button>
+    </div>
+    <div id="contenu_modal_edt" style="display:flex; flex-direction:column; gap:10px;">
+      <p style="color:#999; text-align:center;">Chargement...</p>
+    </div>
+  </div>
+</div>
+</div> <!-- fin .milieu -->
+<footer class="app-footer">Mentions/liens</footer>
+</body>
+</html>
