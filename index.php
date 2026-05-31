@@ -354,3 +354,170 @@ if ($role_actuel == 'Etudiant' && $id_actuel) {
   </div>
 </div>
 
+			
+<div class="page" style="display: none;">
+    <div class="contenu1">
+      <div id="vue_dashboard">
+        <div class="haut1">
+          <div class="gauche">
+            <strong>Gestion des étudiants</strong>
+          </div>
+          <div class="droite">
+            <div class="recherche">
+              <input type="text" placeholder="Rechercher un étudiant...">
+              <div class="btn-filtre" id="Bouton_filtre_etudiant">
+                <img src="filtre.png" height="15" alt="Filtre"> Filtre
+              </div>
+			  <!-- Popup Filtre Étudiants -->
+<div id="menu_filtre_etudiant" class="menu-filtre-popup" style="display: none;">
+  <h4>Filtrer les étudiants</h4>
+
+  <div class="groupe-filtre">
+    <strong>Niveau</strong>
+    <label><input type="checkbox" class="filtre-etudiant" data-champ="niveau" value="ING1"> ING1</label>
+    <label><input type="checkbox" class="filtre-etudiant" data-champ="niveau" value="ING2"> ING2</label>
+    <label><input type="checkbox" class="filtre-etudiant" data-champ="niveau" value="ING3"> ING3</label>
+    <label><input type="checkbox" class="filtre-etudiant" data-champ="niveau" value="ING4_Systeme"> ING4_Système</label>
+    <label><input type="checkbox" class="filtre-etudiant" data-champ="niveau" value="ING4_Cyber"> ING4_Cyber</label>
+    <label><input type="checkbox" class="filtre-etudiant" data-champ="niveau" value="ING4_Finance"> ING4_Finance</label>
+    <label><input type="checkbox" class="filtre-etudiant" data-champ="niveau" value="ING4_Energie"> ING4_Energie</label>
+    <label><input type="checkbox" class="filtre-etudiant" data-champ="niveau" value="ING5_Systeme"> ING5_Système</label>
+    <label><input type="checkbox" class="filtre-etudiant" data-champ="niveau" value="ING5_Cyber"> ING5_Cyber</label>
+    <label><input type="checkbox" class="filtre-etudiant" data-champ="niveau" value="ING5_Finance"> ING5_Finance</label>
+    <label><input type="checkbox" class="filtre-etudiant" data-champ="niveau" value="ING5_Energie"> ING5_Energie</label>
+  </div>
+
+  <div class="groupe-filtre">
+    <strong>Nationalité</strong>
+    <select id="filtre_nationalite_etu" style="width:100%; padding:6px; border:1px solid #ccc; border-radius:4px; margin-top:5px;">
+      <option value="">-- Toutes --</option>
+      <option value="Francaise">Française</option>
+      <option value="Algérienne">Algérienne</option>
+      <option value="Allemande">Allemande</option>
+      <option value="Américaine">Américaine</option>
+      <option value="Belge">Belge</option>
+      <option value="Béninoise">Béninoise</option>
+      <option value="Britannique">Britannique</option>
+      <option value="Burkinabè">Burkinabè</option>
+      <option value="Camerounaise">Camerounaise</option>
+      <option value="Canadienne">Canadienne</option>
+      <option value="Chinoise">Chinoise</option>
+      <option value="Congolaise">Congolaise</option>
+      <option value="Espagnole">Espagnole</option>
+      <option value="Ivoirienne">Ivoirienne</option>
+      <option value="Italienne">Italienne</option>
+      <option value="Japonaise">Japonaise</option>
+      <option value="Malienne">Malienne</option>
+      <option value="Marocaine">Marocaine</option>
+      <option value="Sénégalaise">Sénégalaise</option>
+      <option value="Suisse">Suisse</option>
+      <option value="Togolaise">Togolaise</option>
+      <option value="Tunisienne">Tunisienne</option>
+    </select>
+  </div>
+
+  <div style="display:flex; gap:10px; margin-top:10px;">
+    <button class="btn-appliquer-filtre" id="btn_appliquer_filtre_etudiant">Appliquer</button>
+    <button id="btn_reset_filtre_etudiant" style="padding:8px 15px; background:#CDCDCD; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">Réinitialiser</button>
+  </div>
+</div>
+            </div>
+            <div class="btn">
+              <div id="Ajouter_etudiant"><img src="plus.png" height="15" alt="PLUS"> Ajouter un étudiant</div>
+              <div id="Importer">Importer</div>
+            </div>
+          </div>
+        </div>
+		
+
+      <div class="haut21">
+          <?php
+          // 1. On force l'affichage des erreurs pour ne plus JAMAIS avoir de page blanche
+          error_reporting(E_ALL);
+          ini_set('display_errors', 1);
+
+          // 2. Requête SQL sécurisée (LEFT JOIN permet de ne perdre aucun étudiant)
+          $sql_cartes = "SELECT E.*, C.email, C.telephone 
+                         FROM ETUDIANT E 
+                         LEFT JOIN COMPTE_UTILISATEUR C ON E.id_compte = C.id_compte";
+          $resultat_cartes = mysqli_query($conn, $sql_cartes);
+
+          // 3. Blindage : Si la requête plante, on affiche l'erreur en rouge
+          if (!$resultat_cartes) {
+              echo "<div style='color: red; padding: 20px; border: 2px solid red; background: #ffeeee; width: 100%; border-radius: 10px;'>";
+              echo "<strong>Erreur SQL critique :</strong> " . mysqli_error($conn) . "<br><br>";
+              echo "Vérifie tes tables dans phpMyAdmin.";
+              echo "</div>";
+          } else {
+              // 4. Blindage : Si la base est vide, on l'indique proprement
+              if (mysqli_num_rows($resultat_cartes) == 0) {
+                  echo "<div style='padding: 30px; font-size: 16px; color: #666; width: 100%; text-align: center; background: #fff; border-radius: 10px; border: 1px dashed #ccc;'>";
+                  echo "Aucun étudiant n'est enregistré pour le moment.<br>";
+                  echo "Cliquez sur <strong>+ Ajouter un étudiant</strong> pour commencer.";
+                  echo "</div>";
+              }
+
+              // 5. La boucle d'affichage
+              while ($etudiant_carte = mysqli_fetch_assoc($resultat_cartes)) {
+                  // On sécurise chaque variable au cas où une case serait vide dans la base
+                  $id_db = $etudiant_carte['id_etudiant'] ?? 'N/A';
+                  $prenom = $etudiant_carte['prenom'] ?? 'Inconnu';
+                  $nom = $etudiant_carte['nom'] ?? '';
+                  $nom_complet = htmlspecialchars($prenom . ' ' . $nom);
+                  $numero_etu = htmlspecialchars($etudiant_carte['numero_etudiant'] ?? 'N/A');
+                  $email_etu = htmlspecialchars($etudiant_carte['email_etu'] ?? 'Pas d\'email');
+                  $tel_etu = htmlspecialchars($etudiant_carte['telephone'] ?? 'Pas de téléphone');
+                  $date_naiss_etu = htmlspecialchars($etudiant_carte['date_naissance'] ?? 'N/A');
+                  $filiere_etu = htmlspecialchars($etudiant_carte['nationalite'] ?? 'N/A');
+                  $statut_etu = htmlspecialchars($etudiant_carte['statut'] ?? 'Actif');
+                  $niveau_etu = htmlspecialchars($etudiant_carte['niveau'] ?? 'N/A');
+                  $annee_etu = htmlspecialchars($etudiant_carte['annee_academique'] ?? 'N/A');
+          ?>
+              
+              <div class="bloc-etudiant-complet"
+     data-niveau="<?php echo htmlspecialchars($etudiant_carte['niveau'] ?? ''); ?>"
+     data-statut="<?php echo htmlspecialchars($etudiant_carte['statut'] ?? 'Actif'); ?>"
+     data-nationalite="<?php echo htmlspecialchars($etudiant_carte['nationalite'] ?? ''); ?>"
+     style="display: flex; gap: 20px; width: 100%; margin-bottom: 20px; flex-wrap: wrap;">
+                  <div class="profil" style="margin: 0;">
+                    <div class="caracteristiques">
+                      <strong><?php echo $nom_complet; ?></strong><br> 
+                      ID ÉTUDIANT : <?php echo $numero_etu; ?><br> 
+                      <?php echo $email_etu; ?><br>
+                      <?php echo $tel_etu; ?><br> 
+                      Né(e) le : <?php echo $date_naiss_etu; ?>
+                    </div>
+                    <div class="barriere"></div>
+                    <div class="statut">
+                      <div class="ctn1"><strong>Niveau</strong><br> <?php echo $niveau_etu; ?><br><br>
+                        <strong>Nationalité</strong><br> <?php echo $filiere_etu; ?><br><br>
+                        
+                      </div>
+                      <div class="ctn2">
+                        
+                        <strong>Année</strong><br> <?php echo $annee_etu; ?><br><br>
+						<strong>Statut</strong><br> <?php echo $statut_etu; ?>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="action_rapide">
+                    <strong>Actions rapides</strong>
+                    <div class="rapide btn-voir-profil" data-id="<?php echo $id_db; ?>" style="cursor: pointer;">Voir le profil complet</div>
+                    
+                    <a href="modifier_etudiant.php?id=<?php echo $id_db; ?>" class="rapide" style="background-color: #e6f2ff; color: #0056b3; text-decoration: none; display: block;">
+                      Modifier les informations
+                    </a>
+
+                    <a href="supprimer_etudiant.php?id=<?php echo $id_db; ?>" class="rapide" style="background-color: #ffcccc; color: #cc0000; text-decoration: none; display: block;">
+                      Supprimer l'étudiant
+                    </a>
+                    
+                  </div>
+              </div>
+
+          <?php
+              } // Fin du while
+          } // Fin du else
+          ?>
+
