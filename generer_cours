@@ -1,0 +1,64 @@
+<?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+require_once 'db_connect.php';
+
+mysqli_begin_transaction($conn);
+
+try {
+    // 1. Nettoyage total
+    mysqli_query($conn, "DELETE FROM inscription");
+    mysqli_query($conn, "DELETE FROM note");
+    mysqli_query($conn, "DELETE FROM seance");
+    mysqli_query($conn, "DELETE FROM cours");
+
+    // 2. On récupère les profs actuels de ta base de données
+    $profs = [];
+    $req_profs = mysqli_query($conn, "SELECT id_enseignant FROM enseignant");
+    while($p = mysqli_fetch_assoc($req_profs)) {
+        $profs[] = $p['id_enseignant'];
+    }
+
+    if (empty($profs)) {
+        die("<h3 style='color:red; text-align:center;'>Erreur : Il n'y a aucun enseignant dans ta base de données. Ajoute-en un d'abord !</h3>");
+    }
+
+    // 3. Matrice des modules (ING1 à ING5)
+    $modules = [
+        ['nom' => 'Mathématiques Avancées', 'code' => 'MAT-101', 'dep' => 'Mathématiques', 'niv' => 'ING1', 'hr' => '8h00'],
+        ['nom' => 'Algorithmique & C++', 'code' => 'INF-101', 'dep' => 'Informatique', 'niv' => 'ING1', 'hr' => '10h00'],
+        ['nom' => 'Bases de Données', 'code' => 'INF-201', 'dep' => 'Informatique', 'niv' => 'ING2', 'hr' => '14h30'],
+        ['nom' => 'Réseaux & Télécoms', 'code' => 'RES-201', 'dep' => 'Informatique', 'niv' => 'ING2', 'hr' => '17h00'],
+        ['nom' => 'Génie Logiciel', 'code' => 'INF-301', 'dep' => 'Informatique', 'niv' => 'ING3', 'hr' => '8h00'],
+        ['nom' => 'Intelligence Artificielle', 'code' => 'IA-302', 'dep' => 'Mathématiques', 'niv' => 'ING3', 'hr' => '14h30'],
+        ['nom' => 'Cybersécurité', 'code' => 'CYB-401', 'dep' => 'Informatique', 'niv' => 'ING4', 'hr' => '10h00'],
+        ['nom' => 'Systèmes Embarqués', 'code' => 'EMB-402', 'dep' => 'Electronique', 'niv' => 'ING4', 'hr' => '14h30'],
+        ['nom' => 'Cloud Computing', 'code' => 'CLD-501', 'dep' => 'Informatique', 'niv' => 'ING5', 'hr' => '8h00'],
+        ['nom' => 'Robotique Avancée', 'code' => 'ROB-502', 'dep' => 'Electronique', 'niv' => 'ING5', 'hr' => '10h00']
+    ];
+
+    // 4. Insertion dynamique correspondant EXACTEMENT à ta base
+    foreach ($modules as $m) {
+        $id_prof = $profs[array_rand($profs)];
+        $date_cours = "2026-06-" . str_pad(rand(10, 25), 2, "0", STR_PAD_LEFT);
+
+        $sql = "INSERT INTO cours (nom_matiere, code_cours, departement, niveau, id_enseignant, date_cours, heure) 
+                VALUES (?, ?, ?, ?, ?, ?, ?)";
+        
+        $stmt = mysqli_prepare($conn, $sql);
+        mysqli_stmt_bind_param($stmt, "ssssiss", $m['nom'], $m['code'], $m['dep'], $m['niv'], $id_prof, $date_cours, $m['hr']);
+        mysqli_stmt_execute($stmt);
+    }
+
+    mysqli_commit($conn);
+    echo "<div style='padding: 50px; font-family: sans-serif; text-align: center;'>";
+    echo "<h2 style='color: green;'>✅ Catalogue des cours mis à jour !</h2>";
+    echo "<p>10 nouveaux cours (ING1 à ING5) configurés avec succès.</p>";
+    echo "<a href='index.php' style='padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;'>Retourner au tableau de bord</a>";
+    echo "</div>";
+
+} catch (Exception $e) {
+    mysqli_rollback($conn);
+    echo "<h3 style='color:red; text-align:center;'>Erreur critique : </h3>" . $e->getMessage();
+}
+?>
