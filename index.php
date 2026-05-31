@@ -670,3 +670,223 @@ if ($role_actuel == 'Etudiant' && $id_actuel) {
       if ($role_actuel == "Etudiant" && $id_actuel) {
       ?>
 
+		
+      <div class="panneau-gauche" style="flex: 2; background: #fefdfe; padding: 20px; border-radius: 10px; border: 1px solid #e0e0e0;">
+        <h3 style="margin-top: 0; color: #333; border-bottom: 2px solid #0056b3; padding-bottom: 10px;">Catalogue des cours disponibles</h3>
+        
+        <div class="dashboard-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-top: 15px; max-height: 500px; overflow-y: auto; padding-right: 10px;">
+            
+          <?php
+          // Requête pour chercher les cours correspondants au NIVEAU de l'étudiant et où il n'est pas inscrit
+          $sql_cours_dispo = "SELECT C.id_cours, C.nom_matiere, C.code_cours,C.date_cours, C.niveau,C.heure,E.nom AS prof_nom, E.prenom AS prof_prenom
+                              FROM COURS C
+                              LEFT JOIN ENSEIGNANT E ON C.id_enseignant = E.id_enseignant
+                              WHERE C.niveau = (SELECT niveau FROM ETUDIANT WHERE id_etudiant = ?)
+                              AND C.id_cours NOT IN (
+                                  SELECT id_cours FROM INSCRIPTION WHERE id_etudiant = ?
+                              )";
+          $stmt_cd = mysqli_prepare($conn, $sql_cours_dispo);
+          // On passe deux fois l'ID actuel car il y a deux "?" dans la requête
+          mysqli_stmt_bind_param($stmt_cd, "ii", $id_actuel, $id_actuel);
+          mysqli_stmt_execute($stmt_cd);
+          $res_cd = mysqli_stmt_get_result($stmt_cd);
+
+          if (mysqli_num_rows($res_cd) == 0) {
+              echo "<div style='grid-column: 1 / -1; padding: 20px; background: white; text-align: center; color: #666; border-radius: 8px;'>Aucun nouveau cours disponible pour le moment.</div>";
+          } else {
+              while ($cd = mysqli_fetch_assoc($res_cd)) {
+    $prof_dispo = !empty($cd['prof_nom']) ? htmlspecialchars($cd['prof_prenom'].' '.$cd['prof_nom']) : "Non assigné";
+    
+    // Compter les inscrits actuels
+    $stmt_nb = mysqli_prepare($conn, "SELECT COUNT(*) FROM INSCRIPTION WHERE id_cours = ?");
+    mysqli_stmt_bind_param($stmt_nb, "i", $cd['id_cours']);
+    mysqli_stmt_execute($stmt_nb);
+    $nb_act = mysqli_fetch_row(mysqli_stmt_get_result($stmt_nb))[0];
+    $cap    = $cd['capacite_max'] ?? 30;
+    $plein  = ($nb_act >= $cap);
+    
+    echo '<div class="dashboard-card" style="background:white; padding:15px; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.1); display:flex; flex-direction:column; justify-content:space-between; '.($plein ? 'opacity:0.7;' : '').'">';
+    echo '<div>';
+    echo '<h4 style="color:#0056b3; margin:0 0 10px 0;">'.htmlspecialchars($cd['nom_matiere']).'</h4>';
+    echo '<p style="font-size:14px; margin:5px 0;">Code : <strong>'.htmlspecialchars($cd['code_cours']).'</strong></p>';
+    echo '<p style="font-size:13px; color:#666; margin:5px 0;">Niveau: '.htmlspecialchars($cd['niveau']).'&nbsp;&nbsp;&nbsp;&nbsp;Date : '.htmlspecialchars($cd['date_cours']).'</p>';
+    echo '<p style="font-size:13px; color:#666; margin:5px 0;">Prof: '.$prof_dispo.'&nbsp;&nbsp;&nbsp;&nbsp;Horaire : '.htmlspecialchars($cd['heure']).'</p>';
+    
+    // Badge places restantes
+    $places = $cap - $nb_act;
+    $badge_color = $plein ? '#cc0000' : ($places <= 3 ? '#ffc107' : '#28a745');
+    $badge_text  = $plein ? '🔒 Complet' : $places.' place'.($places > 1 ? 's' : '').' restante'.($places > 1 ? 's' : '');
+    echo '<p style="margin:8px 0 0;"><span style="background:'.($plein?'#ffe6e6':($places<=3?'#fff3cd':'#e6f7ec')).'; color:'.$badge_color.'; padding:4px 10px; border-radius:12px; font-size:12px; font-weight:bold;">'.$badge_text.'</span></p>';
+    echo '</div>';
+    
+    if ($plein) {
+        echo '<div style="display:block; text-align:center; background:#e0e0e0; color:#999; padding:8px; border-radius:5px; font-weight:bold; margin-top:15px; font-size:14px; cursor:not-allowed;">Cours complet</div>';
+    } else {
+        echo '<a href="etudiant_sinscrire.php?id_cours='.$cd['id_cours'].'&id_etu='.$id_actuel.'" style="display:block; text-align:center; background:#28a745; color:white; padding:8px; text-decoration:none; border-radius:5px; font-weight:bold; margin-top:15px; font-size:14px;">S\'inscrire</a>';
+    }
+    echo '</div>';
+}
+          }
+          ?>
+        </div>
+      </div>
+
+      <div class="panneau-droite" style="flex: 1; background: #ffffff; padding: 20px; border-radius: 10px; border: 1px solid #d6d8db; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+        <h3 style="margin-top: 0; color: #333; border-bottom: 2px solid #6c757d; padding-bottom: 10px;">Mes cours inscrits</h3>
+        <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 15px;">
+            
+          <?php
+          // Ta requête d'origine pour chercher les cours de l'étudiant
+          $sql_mes_cours = "SELECT C.id_cours, C.nom_matiere, C.code_cours,C.date_cours, C.niveau,C.heure,E.nom AS prof_nom, E.prenom AS prof_prenom
+                            FROM INSCRIPTION I
+                            JOIN COURS C ON I.id_cours = C.id_cours
+                            LEFT JOIN ENSEIGNANT E ON C.id_enseignant = E.id_enseignant
+                            WHERE I.id_etudiant = ?";
+          $stmt_mc = mysqli_prepare($conn, $sql_mes_cours);
+          mysqli_stmt_bind_param($stmt_mc, "i", $id_actuel);
+          mysqli_stmt_execute($stmt_mc);
+          $res_mc = mysqli_stmt_get_result($stmt_mc);
+
+          if (mysqli_num_rows($res_mc) == 0) {
+              echo "<div style='padding: 20px; background: #f8f9fa; border-radius: 8px; text-align: center; color: #666;'>Vous n'êtes inscrit à aucun cours.</div>";
+          } else {
+              while ($mc = mysqli_fetch_assoc($res_mc)) {
+                  $prof = !empty($mc['prof_nom']) ? htmlspecialchars($mc['prof_prenom'].' '.$mc['prof_nom']) : "Non assigné";
+                  echo '<div style="padding: 15px; border-left: 4px solid #0056b3; background: #f8f9fa; border-radius: 4px;">';
+                  echo '<h4 style="margin: 0 0 5px 0; color: #0056b3; font-size: 15px;">' . htmlspecialchars($mc['nom_matiere']??'Non defini') . '</h4>';
+                  echo '<p style="margin: 0; font-size: 13px; color: #555;">Code: <strong>' . htmlspecialchars($mc['code_cours']??'Non defini') .'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Date :&nbsp; ' . htmlspecialchars($mc['date_cours']?? 'Non defini') .'</strong></p>';
+                  echo '<p style="margin: 3px 0 0 0; font-size: 12px; color: #777;">Prof: ' . $prof . '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Date :&nbsp; ' . htmlspecialchars($mc['heure']?? 'Non defini') .'</p>';
+                  echo '</div>';
+              }
+          }
+          ?>
+        </div>
+      </div>
+
+      <?php
+      } // Fin du if ($role_actuel == "Etudiant")
+      ?>
+      
+    </div>
+	</div>
+  </div>
+</div>
+  <div class="emploi" style="display: none;">
+    <div class="contenu2">
+      <div id="vue_emploi_temps">
+        <div class="haut12" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+          <div class="gauche">
+            <strong>EMPLOI DU TEMPS</strong>
+          </div>
+          <div class="droite" style="display: flex; align-items: center; gap: 15px;">
+            <button id="btn_semaine_prec" style="cursor: pointer; padding: 5px 15px; border-radius: 5px; border: 1px solid #ccc; background: #fff;">&lt; Précédent</button>
+            <span id="affichage_semaine" style="font-weight: bold; font-size: 16px; color: #333;">Semaine actuelle</span>
+            <button id="btn_semaine_suiv" style="cursor: pointer; padding: 5px 15px; border-radius: 5px; border: 1px solid #ccc; background: #fff;">Suivant &gt;</button>
+          </div>
+        </div>
+
+        <?php
+        // 1. Récupération de TOUS les cours de l'étudiant sous format JSON
+        $cours_edt_json = "[]";
+        if ($role_actuel == 'Etudiant' && $id_actuel) {
+            // On récupère directement la date_cours et l'heure dans la table cours
+            $sql_edt = "SELECT C.nom_matiere, C.date_cours, C.heure, C.salle,
+                   E.nom AS prof_nom, E.prenom AS prof_prenom
+            FROM inscription I
+            JOIN cours C ON I.id_cours = C.id_cours
+            LEFT JOIN ENSEIGNANT E ON C.id_enseignant = E.id_enseignant
+            WHERE I.id_etudiant = ? AND C.date_cours IS NOT NULL";
+            $stmt_edt = mysqli_prepare($conn, $sql_edt);
+            mysqli_stmt_bind_param($stmt_edt, "i", $id_actuel);
+            mysqli_stmt_execute($stmt_edt);
+            $res_edt = mysqli_stmt_get_result($stmt_edt);
+
+            $cours_etudiant = [];
+            while ($row = mysqli_fetch_assoc($res_edt)) {
+                $cours_etudiant[] = $row;
+            }
+            // On transforme le résultat PHP en format compris par le JS
+            $cours_edt_json = json_encode($cours_etudiant);
+        }
+        ?>
+
+        <div class="grille-edt" id="conteneur_grille_edt" data-cours='<?php echo htmlspecialchars($cours_edt_json ?? "[]", ENT_QUOTES, "UTF-8"); ?>'>
+           </div>
+
+      </div>
+    </div>
+  </div>
+<div class="notation" style="display: none;">
+  <div class="contenu2">
+    <div id="vue_note">
+      <div class="haut12" style="display:flex; justify-content:space-between; align-items:center;">
+        <div class="gauche"><strong>MES NOTES & RÉSULTATS</strong></div>
+      </div>
+
+      <?php
+      // ====== CALCULS POUR L'ÉTUDIANT ======
+      $notes_lignes = [];
+$somme_ponderee = 0; $somme_coeffs = 0; $meilleure = null; $pire = null;
+      if ($role_actuel == 'Etudiant' && $id_actuel) {
+          $sql_notes_etu = "SELECT C.nom_matiere, N.coefficient, N.note, N.commentaire, N.evaluation
+                            FROM INSCRIPTION I
+                            JOIN COURS C ON I.id_cours = C.id_cours
+                            LEFT JOIN note N ON I.id_cours = N.id_cours AND N.id_etudiant = I.id_etudiant
+                            WHERE I.id_etudiant = ?
+                            ORDER BY C.nom_matiere ASC";
+          $stmt_ne = mysqli_prepare($conn, $sql_notes_etu);
+          mysqli_stmt_bind_param($stmt_ne, "i", $id_actuel);
+          mysqli_stmt_execute($stmt_ne);
+          $res_ne = mysqli_stmt_get_result($stmt_ne);
+          while ($n = mysqli_fetch_assoc($res_ne)) {
+              $notes_lignes[] = $n;
+              if (isset($n['note']) && $n['note'] !== null && $n['note'] !== '' && is_numeric($n['note'])) {
+    $v     = (float)$n['note'];
+    $coeff = (isset($n['coefficient']) && $n['coefficient'] > 0) ? (float)$n['coefficient'] : 1;
+    $somme_ponderee += $v * $coeff;
+    $somme_coeffs   += $coeff;
+    if ($meilleure === null || $v > $meilleure) $meilleure = $v;
+    if ($pire === null || $v < $pire) $pire = $v;
+}
+          }
+      }
+      $moyenne = ($somme_coeffs > 0) ? round($somme_ponderee / $somme_coeffs, 2) : null;
+$nb_notes = count(array_filter($notes_lignes, fn($n) => $n['note'] !== null && $n['note'] !== ''));
+      ?>
+
+      <!-- Cartes de synthèse -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:15px; margin-top:20px;">
+        <div style="background:white; border-radius:12px; padding:20px; box-shadow:0 2px 8px rgba(0,0,0,0.06); border-left:5px solid #0056b3;">
+          <div style="font-size:13px; color:#888; text-transform:uppercase; letter-spacing:.5px;">Moyenne générale</div>
+          <div style="font-size:32px; font-weight:bold; color:<?php echo ($moyenne!==null && $moyenne>=10)?'#28a745':($moyenne!==null?'#cc0000':'#999'); ?>; margin-top:6px;">
+            <?php echo $moyenne!==null ? $moyenne.' <span style="font-size:16px;color:#aaa;">/20</span>' : '—'; ?>
+          </div>
+        </div>
+        <div style="background:white; border-radius:12px; padding:20px; box-shadow:0 2px 8px rgba(0,0,0,0.06); border-left:5px solid #28a745;">
+          <div style="font-size:13px; color:#888; text-transform:uppercase; letter-spacing:.5px;">Meilleure note</div>
+          <div style="font-size:32px; font-weight:bold; color:#28a745; margin-top:6px;">
+            <?php echo $meilleure!==null ? $meilleure.' <span style="font-size:16px;color:#aaa;">/20</span>' : '—'; ?>
+          </div>
+        </div>
+        <div style="background:white; border-radius:12px; padding:20px; box-shadow:0 2px 8px rgba(0,0,0,0.06); border-left:5px solid #ffc107;">
+          <div style="font-size:13px; color:#888; text-transform:uppercase; letter-spacing:.5px;">Notes reçues</div>
+          <div style="font-size:32px; font-weight:bold; color:#333; margin-top:6px;">
+            <?php echo $nb_notes; ?> <span style="font-size:16px;color:#aaa;">/ <?php echo count($notes_lignes); ?></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tableau détaillé -->
+      <div class="grille-note" style="margin-top:20px; background:white; padding:20px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+        <table style="width:100%; border-collapse:collapse; text-align:left;">
+          <thead>
+            <tr style="background:#0056b3; color:white;">
+              <th style="padding:15px; border-radius:8px 0 0 0;">Matière</th>
+<th style="padding:15px;">Évaluation</th>
+<th style="padding:15px; text-align:center;">Coeff</th>
+<th style="padding:15px; text-align:center;">Note</th>
+<th style="padding:15px; border-radius:0 8px 0 0;">Appréciation</th>
+            </tr>
+          </thead>
+          <tbody>
+
