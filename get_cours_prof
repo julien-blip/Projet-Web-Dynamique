@@ -14,4 +14,21 @@ $res = mysqli_stmt_get_result($stmt);
 if (mysqli_num_rows($res) == 0) {
     echo "<p style='color:#666; text-align:center;'>Aucun cours assigné à cet enseignant.</p>";
     exit;
-} ?>
+} 
+
+while ($c = mysqli_fetch_assoc($res)) {
+    echo '<div style="display:flex; justify-content:space-between; align-items:center; padding:12px 15px; border-left:4px solid #0056b3; background:#f8f9fa; border-radius:4px;">';
+    echo '  <div>';
+    echo '    <strong style="color:#0056b3;">' . htmlspecialchars($c['nom_matiere']) . '</strong>';
+    echo '    <span style="color:#666; font-size:13px;"> — ' . htmlspecialchars($c['code_cours']) . '</span><br>';
+    echo '    <span style="font-size:13px; color:#555;">Niveau : ' . htmlspecialchars($c['niveau']) . '</span>';
+    echo '  </div>';
+    echo '  <div style="text-align:right; font-size:13px; color:#555;">';
+    echo '    📅 ' . htmlspecialchars($c['date_cours']) . '<br>';
+    echo '    🕐 ' . htmlspecialchars($c['heure']) . '<br>';
+    echo '    📍 ' . htmlspecialchars($c['Salle'] ?? 'N/A');
+    echo '  </div>';
+    echo '</div>';
+}
+
+?>
