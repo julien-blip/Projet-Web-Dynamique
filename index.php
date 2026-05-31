@@ -917,73 +917,7 @@ echo '</tr>';
                 }
             }
             ?>
-          </tbody>
-        </table>
-      </div>
 
-    </div>
-  </div>
-</div>
-
-  <div class="messagerie" style="display: none;">
-    <div class="contenu2">
-      <div class="haut12" style="display: flex; justify-content: space-between; align-items: center;">
-        <div class="gauche">
-          <strong>MESSAGES</strong>
-        </div>
-        <div class="droite">
-          <input type="text" id="recherche_contact_msg" placeholder="Rechercher un contact..." style="padding: 8px; border-radius: 5px; border: 1px solid #ccc; width: 200px;">
-        </div>
-      </div>
-
-      <div class="container-messagerie">
-        
-        <!-- COLONNE GAUCHE : LISTE DES CONTACTS (Remplie avec PHP) -->
-        <div class="liste-contacts" id="liste_des_contacts" style="overflow-y: auto; max-height: 500px;">
-          <?php
-          // 1. On liste tous les Professeurs
-          $req_profs_msg = mysqli_query($conn, "SELECT id_enseignant AS id, nom, prenom, 'Professeur' AS role FROM ENSEIGNANT ORDER BY nom ASC");
-          while($p = mysqli_fetch_assoc($req_profs_msg)) {
-              // On ne s'affiche pas soi-même dans la liste
-              if ($role_actuel == 'Professeur' && $id_actuel == $p['id']) continue;
-              
-              echo '<div class="contact contact-item" data-id="'.$p['id'].'" data-role="'.$p['role'].'" data-nom="'.htmlspecialchars($p['prenom'].' '.$p['nom']).'" style="cursor: pointer;">';
-              echo '  <div class="photo-contact"></div>';
-              echo '  <div class="info-contact">';
-              echo '    <h4>'.htmlspecialchars($p['prenom'].' '.$p['nom']).'</h4>';
-              echo '    <p style="font-size: 11px; color: #888;">Professeur</p>';
-              echo '  </div>';
-              echo '</div>';
-          }
-<!-- COLONNE DROITE : LE TCHAT -->
-        <div class="zone-discussion" id="zone_discussion_ajax">
-          <div class="entete-discussion" style="display: flex; align-items: center; gap: 10px;">
-            <div class="photo-contact" id="chat_photo" style="display: none;"></div>
-            <h3 id="nom_contact_actif">Sélectionnez un contact pour discuter</h3>
-          </div>
-
-          <div class="historique-messages" id="boite_messages" style="display: flex; flex-direction: column; overflow-y: auto; padding: 20px;">
-            <!-- Les messages arriveront ici automatiquement -->
-            <div style="text-align: center; color: #999; margin-top: 50px;">
-               👈 Cliquez sur un nom dans la liste à gauche.
-            </div>
-          </div>
-
-          <div class="zone-saisie" id="zone_saisie_message" style="display: none;">
-            <!-- Champs cachés pour dire à PHP qui envoie à qui -->
-            <input type="hidden" id="expediteur_id" value="<?php echo $id_actuel; ?>">
-            <input type="hidden" id="expediteur_role" value="<?php echo $role_actuel; ?>">
-            <input type="hidden" id="destinataire_id" value="">
-            <input type="hidden" id="destinataire_role" value="">
-            
-            <input type="text" id="input_nouveau_message" placeholder="Écrivez votre message...">
-            <button id="btn_envoyer_ajax">Envoyer</button>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
 
           // 2. On liste tous les Étudiants
           $req_etus_msg = mysqli_query($conn, "SELECT id_etudiant AS id, nom, prenom, 'Etudiant' AS role FROM ETUDIANT ORDER BY nom ASC");
